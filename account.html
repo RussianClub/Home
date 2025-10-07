@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Russian Club - My Account</title>
+    
+    <style>
+        /* Global & Reset Styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #1a1a1a;
+            color: #f0f0f0;
+        }
+        .container {
+            max-width: 450px; 
+            margin: 0 auto;
+            padding: 0;
+            background-color: #1a1a1a;
+        }
+
+        /* Define fixed header/footer height for content padding */
+        :root {
+            --header-height: 55px; 
+            --footer-height: 65px;
+        }
+        /* ------------------- GLASSMORPHIC STICKY HEADER ------------------- */
+        .sticky-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            max-width: 450px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(12px) saturate(180%);
+            -webkit-backdrop-filter: blur(12px) saturate(180%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;  
+            font-weight: 800;    
+            z-index: 1000;
+            border-radius: 0 0 12px 12px;
+            letter-spacing: 1px;
+            padding: 8px 12px; 
+        }
+        .header-text {
+            text-shadow: 0 2px 6px rgba(0,0,0,0.6);
+            display: flex;
+        }
+        .header-text span {
+            padding: 4px 8px;
+            font-size: 1.05em;
+        }
+        .header-text .russian-color {
+            color: #e50074; 
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 6px 0 0 6px;
+            font-weight: 900;
+        }
+        .header-text .club-color {
+            color: white;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 0 6px 6px 0;
+            font-weight: 700;
+        }
+
+        /* ------------------- MAIN CONTENT AREA ------------------- */
+        .main-content {
+            padding-top: calc(var(--header-height) + 10px); 
+            padding-bottom: var(--footer-height); 
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+
+        /* ------------------- Profile Header (With Edit Button) ------------------- */
+        .profile-header {
+            display: flex;
+            align-items: center;
+            padding: 20px 0;
+            background-color: #333;
+            margin-top: 10px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+            position: relative; 
+        }
+        
+        .avatar-container {
+            position: relative;
+            margin: 0 15px;
+        }
+        
+        .profile-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 3px solid #ffc700;
+        }
+        
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* --- Updated Edit Icon Styling (Bigger and Better) --- */
+        .edit-icon {
+            position: absolute;
+            bottom: -2px; 
+            right: -2px;
+            background-color: #e50074;
+            border-radius: 50%;
+            width: 25px; 
+            height: 25px; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: 2px solid #1a1a1a; 
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.5); 
+            transition: transform 0.2s;
+        }
+        
+        .edit-icon:hover {
+            transform: scale(1.1);
+        }
+        
+        .edit-icon svg {
+            width: 14px; 
+            height: 14px; 
+            fill: white;
+        }
+        
+        /* State for when data is loading */
+        .edit-icon.loading {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+        /* ----------------------------- */
+
+        .profile-info {
+            flex-grow: 1;
+        }
+        .profile-info .username {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 3px;
+        }
+        .profile-info .uid {
+            font-size: 0.8em;
+            color: #ccc;
+        }
+        .profile-info .last-login {
+            font-size: 0.7em;
+            color: #999;
+        }
+
+        /* ------------------- Balance Section (Existing) ------------------- */
+        .balance-section {
+            background-color: #333;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+        .balance-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .total-balance {
+            font-size: 1.1em;  
+            font-weight: bold;
+            color: #ffc700; 
+        }
+        .wallet-actions {
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+        }
+        .action-item {
+            text-decoration: none;
+            color: #f0f0f0;
+            font-size: 0.8em;
+        }
+        .action-item img {
+            width: 40px;
+            height: 40px;
+            margin: 0 auto 5px;
+            display: block;
+        }
+
+        /* ------------------- Menu Grid (Existing) ------------------- */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .menu-item {
+            background-color: #333;
+            padding: 15px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: #f0f0f0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            transition: background-color 0.2s;
+        }
+        .menu-item:hover {
+             background-color: #444;
+        }
+        .menu-item img {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+        }
+        .menu-text .title {
+            font-weight: bold;
+            font-size: 0.95em;
+            display: block;
+        }
+        .menu-text .subtitle {
+            font-size: 0.6em;
+            color: #999;
+            display: block;
+        }
+
+        /* ------------------- List Menu (Existing) ------------------- */
+        .list-menu {
+            margin: 20px 0;
+        }
+        .list-menu-item {
+            background-color: #333;
+            padding: 15px;
+            margin-bottom: 1px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-decoration: none;
+            color: #f0f0f0;
+            border-bottom: 1px solid #444;
+            transition: background-color 0.2s;
+        }
+        .list-menu-item:first-child {
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+        }
+        .list-menu-item:last-child {
+            border-bottom-left-radius: 8px;
+            border-bottom-right-radius: 8px;
+            border-bottom: none;
+        }
+        .list-menu-item:hover {
+             background-color: #444;
+        }
+        .list-menu-item .left-content {
+            display: flex;
+            align-items: center;
+            font-weight: bold;
+            font-size: 0.95em;
+        }
+        .list-menu-item img {
+            width: 34px;
+            height: 34px;
+            margin-right: 10px;
+        }
+        .list-menu-item .arrow {
+            color: #ffc700;
+            font-size: 1.2em;
+        }
+        .notification-count {
+            background-color: red;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 0.7em;
+            margin-left: 10px;
+            font-weight: bold;
+        }
+
+        /* ------------------- Service Center Grid (Existing) ------------------- */
+        .service-center {
+            text-align: center;
+            padding: 10px 0;
+        }
+        .service-center h3 {
+            margin: 0 0 15px 0;
+            font-size: 1.1em;
+            color: #ffc700;
+        }
+        .service-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px; 
+        }
+        .service-item {
+            text-decoration: none;
+            color: #f0f0f0;
+            font-size: 0.75em; 
+        }
+        .service-item img {
+            width: 40px;
+            height: 40px;
+            margin-bottom: 5px;
+        }
+        
+        /* ------------------- Log Out Button (Existing) ------------------- */
+        .logout-button-container {
+            text-align: center;
+            padding: 20px 0;
+        }
+        .logout-button {
+            display: inline-block;
+            width: 90%;
+            background-color: #e50074;
+            color: white;
+            padding: 12px 0;
+            border-radius: 30px;
+            font-size: 1.1em;
+            font-weight: bold;
+            text-decoration: none;
+            box-shadow: 0 4px 10px rgba(229, 0, 116, 0.5);
+            margin-top: 10px;
+            cursor: pointer; /* Added cursor pointer */
+            border: none; /* Added border none for consistency */
+        }
+
+        /* ------------------- FIXED BOTTOM NAVIGATION (Existing) ------------------- */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 65px;
+            max-width: 450px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px) saturate(180%);
+            -webkit-backdrop-filter: blur(12px) saturate(180%);
+            border-top: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.2);
+            z-index: 999;
+        }
+
+        .bottom-nav .nav-item {
+            flex: 1;
+            text-align: center;
+            color: #ccc;
+            font-size: 12px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+        }
+
+        .bottom-nav .nav-item img {
+            width: 25px;
+            height: 25px;
+            margin-bottom: 3px;
+            transition: transform 0.3s ease, filter 0.3s ease;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+        }
+
+        .bottom-nav .nav-item.active {
+            color: #ffc700;
+            font-weight: bold;
+        }
+
+        .bottom-nav .nav-item.active img {
+            transform: translateY(-3px) scale(1.1);
+            filter: drop-shadow(0 4px 6px rgba(255,199,0,0.6));
+        }
+        
+        .bottom-nav .nav-item.active span::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 2px;
+            background: #ffc700;
+            border-radius: 2px;
+            animation: underline 0.3s ease forwards;
+        }
+
+        @keyframes underline {
+            from { width: 0; opacity: 0; }
+            to { width: 20px; opacity: 1; }
+        }
+
+        .special-nav-button {
+            position: relative;
+            background: linear-gradient(135deg, #ffcc00, #ff8800);
+            padding: 12px 18px;
+            border-radius: 40px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #1a1a1a;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            transform: translateY(10%);
+            text-decoration: none;
+            text-align: center;
+            transition: transform 0.2s ease;
+            align-self: center;
+            margin: 0 10px;
+        }
+
+        /* ------------------- MODAL/POPUP STYLES ------------------- */
+        .modal {
+            display: none; 
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.8);
+        }
+
+        .modal-content {
+            background-color: #2a2a2a;
+            margin: 20% auto; 
+            padding: 20px;
+            border: 1px solid #ffc700;
+            width: 90%; 
+            max-width: 300px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #444;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.3em;
+            color: #ffc700;
+        }
+
+        .close-button {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: #e50074; 
+            text-decoration: none;
+        }
+        
+        /* Username Input Style */
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #f0f0f0;
+            font-size: 0.9em;
+        }
+        .username-input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #444;
+            border-radius: 8px;
+            background-color: #1a1a1a;
+            color: white;
+            box-sizing: border-box;
+        }
+
+        /* Avatar Selection Grid */
+        .avatar-selection-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+            padding-bottom: 15px;
+        }
+
+        .avatar-option {
+            width: 95%;
+            aspect-ratio: 1 / 1;
+            border: 2px solid transparent;
+            border-radius: 50%;
+            overflow: hidden;
+            cursor: pointer;
+            transition: border-color 0.2s, transform 0.2s;
+            background-color: #444; 
+        }
+        
+        .avatar-option img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .avatar-option.selected {
+            border-color: #e50074;
+            transform: scale(1.1);
+            box-shadow: 0 0 8px rgba(229, 0, 116, 0.7);
+        }
+        
+        /* Save Button */
+        .save-button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(90deg, #ffc700, #ff8800);
+            color: #1a1a1a;
+            font-size: 1.1em;
+            font-weight: bold;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        
+        .save-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        /* ---------------------------------------------------------- */
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <div class="sticky-header">
+            <div class="header-text">
+                <span class="russian-color">RUSSIAN</span><span class="club-color">CLUB</span>
+            </div>
+        </div>
+        
+        <div class="main-content">
+
+            <div class="profile-header">
+                <div class="avatar-container">
+                    <div class="profile-avatar">
+                        <img id="profile-avatar" src="assets/png/4-12a0d0c5.webp" alt="User Avatar">
+                    </div>
+                    <button class="edit-icon loading" id="open-edit-modal">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 20h9" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M16.5 3.5l-2.5 2.5 4 4 2.5-2.5c.34-.34.34-.89 0-1.23l-2.77-2.77c-.34-.34-.89-.34-1.23 0z" fill="white" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="profile-info">
+                    <div class="username" id="profile-username">Fetching...</div>
+                    <div class="uid" id="profile-uid">UID | ...</div>
+                    <div class="last-login" id="profile-last-login">Last login: ...</div>
+                </div>
+            </div>
+
+            <div class="balance-section">
+                <div class="balance-row">
+                    <span class="total-balance" id="total-balance">Total balance: ₹0.00</span>
+                </div>
+                <div class="wallet-actions">
+                    <a href="wallet.html" class="action-item">
+                        <img src="assets/png/wallet.png" alt="Wallet">
+                        Wallet
+                    </a>
+                    <a href="deposit.html" class="action-item">
+                        <img src="assets/png/deposit.png" alt="Deposit">
+                        Deposit
+                    </a>
+                    <a href="widrwal.html" class="action-item">
+                        <img src="assets/png/widrwal.png" alt="Withdraw">
+                        Withdraw
+                    </a>
+                    <a href="#" class="action-item">
+                        <img src="assets/png/vip.png" alt="VIP">
+                        VIP
+                    </a>
+                </div>
+            </div>
+            
+            <div class="menu-grid">
+                <a href="#" class="menu-item">
+                    <img src="assets/png/gamehistory.png" alt="Game History">
+                    <div class="menu-text">
+                        <span class="title">Game History</span>
+                        <span class="subtitle">My game history</span>
+                    </div>
+                </a>
+                <a href="#" class="menu-item">
+                    <img src="assets/png/transection.png" alt="Transaction">
+                    <div class="menu-text">
+                        <span class="title">Transaction</span>
+                        <span class="subtitle">My transaction history</span>
+                    </div>
+                </a>
+                <a href="diposithistory.html" class="menu-item">
+                    <img src="assets/png/diposithistory.png" alt="Deposit">
+                    <div class="menu-text">
+                        <span class="title">Deposit</span>
+                        <span class="subtitle">My deposit history</span>
+                    </div>
+                </a>
+                <a href="widrwalhistory.html" class="menu-item">
+                    <img src="assets/png/widrwalhistory.png" alt="Withdraw">
+                    <div class="menu-text">
+                        <span class="title">Withdraw</span>
+                        <span class="subtitle">My withdraw history</span>
+                    </div>
+                </a>
+            </div>
+
+            <div class="list-menu">
+                <a href="#" class="list-menu-item">
+                    <div class="left-content">
+                        <img src="assets/png/notificationn.png" alt="Notification">
+                        Notification
+                        <span class="notification-count" id="notification-count">0</span>
+                    </div>
+                    <span class="arrow">></span>
+                </a>
+                <a href="gift.html" class="list-menu-item">
+                    <div class="left-content">
+                        <img src="assets/png/gift.png" alt="Gifts">
+                        Gifts
+                    </div>
+                    <span class="arrow">></span>
+                </a>
+                <a href="#" class="list-menu-item">
+                    <div class="left-content">
+                        <img src="assets/png/gamestatics.png" alt="Game Statistics">
+                        Game statistics
+                    </div>
+                    <span class="arrow">></span>
+                </a>
+                    <a href="#" class="list-menu-item">
+                    <div class="left-content">
+                        <img src="assets/png/language.png" alt="Language">
+                        Language
+                    </div>
+                    <div style="color: #ffc700; font-size: 0.9em; display: flex; align-items: center;">
+                        English
+                        <span class="arrow" style="margin-left: 5px;">></span>
+                    </div>
+                </a>
+            </div>
+
+            <div class="service-center">
+                <h3>Service center</h3>
+                <div class="service-grid">
+                    <a href="setting.html" class="service-item">
+                        <img src="assets/png/setting.png" alt="Settings">
+                        Settings
+                    </a>
+                    <a href="#" class="service-item">
+                        <img src="assets/png/feedback.png" alt="Feedback">
+                        Feedback
+                    </a>
+                    <a href="#" class="service-item">
+                        <img src="assets/png/announcement.png" alt="Announcement">
+                        Announcement
+                    </a>
+                    <a href="#" class="service-item">
+                        <img src="assets/png/customerservice.png" alt="Customer Service">
+                        Customer Service
+                    </a>
+                    <a href="#" class="service-item">
+                        <img src="assets/png/bguide.png" alt="Beginner's Guide">
+                        Beginner's Guide
+                    </a>
+                    <a href="#" class="service-item">
+                        <img src="assets/png/aboutus.png" alt="About us">
+                        About us
+                    </a>
+                </div>
+            </div>
+
+            <div class="logout-button-container">
+                <button class="logout-button" id="logout-button">Log out</button>
+            </div>
+
+        </div>
+
+        <div class="bottom-nav">
+            <a href="home.html" class="nav-item">
+                <img src="https://img.icons8.com/ios-filled/50/ffffff/home.png" alt="Home">
+                <span>Home</span>
+            </a>
+            <a href="activity.html" class="nav-item">
+                <img src="https://img.icons8.com/ios-filled/50/ffffff/activity-history.png" alt="Activity">
+                <span>Activity</span>
+            </a>
+            <a href="#" class="special-nav-button">
+                GET ₹300
+            </a>
+            <a href="promotion.html" class="nav-item">
+                <img src="https://img.icons8.com/ios-filled/50/ffffff/discount--v1.png" alt="Promotion">
+                <span>Promotion</span>
+            </a>
+            <a href="account.html" class="nav-item active"> 
+                <img src="https://img.icons8.com/ios-filled/50/ffc700/user.png" alt="My"> 
+                <span>Account</span>
+            </a>
+        </div>
+    </div>
+
+    <div id="editProfileModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Edit Profile</h2>
+                <span class="close-button" id="close-edit-modal">&times;</span>
+            </div>
+            
+            <div class="form-group">
+                <label for="edit-username">Username</label>
+                <input type="text" id="edit-username" class="username-input" placeholder="Enter new username" maxlength="20">
+            </div>
+
+            <div class="form-group">
+                <label>Choose Avatar (Select one)</label>
+                <div class="avatar-selection-grid" id="avatar-grid">
+                    </div>
+            </div>
+
+            <button class="save-button" id="save-profile-button">Save Changes</button>
+        </div>
+    </div>
+    
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    
+    <script>
+        // --- Firebase Config (MUST be present) ---
+        var firebaseConfig = {
+            apiKey: "AIzaSyDlEY_2bDv25T5GTCzTEk7sQIZrAxh5irc",
+            authDomain: "russian-club.firebaseapp.com",
+            databaseURL: "https://russian-club-default-rtdb.firebaseio.com",
+            projectId: "russian-club",
+            storageBucket: "russian-club.appspot.com",
+            messagingSenderId: "1096848291195",
+            appId: "1:1096848291195:web:2c8c12e9c6c913f83210c7",
+            measurementId: "G-5M46DNJ1YP"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+
+        // Global instances
+        window.db = firebase.firestore();
+
+        // --- GLOBAL VARIABLES ---
+        let currentAuthUserUID = null; // Store the Custom UID from localStorage
+        let currentUserData = {};
+        const db = firebase.firestore(); 
+
+        // --- Avatar Paths Array (Verify these paths in your 'assets/png/' folder) ---
+        const AVATAR_PATHS = [
+            'assets/png/4-12a0d0c5.webp',
+            'assets/png/1-a6662edb.webp', 
+            'assets/png/12-ae12c679.webp',
+            'assets/png/5-ab77b716.webp', 
+            'assets/png/6-7c7f5203.webp', 
+            'assets/png/7-00479cfa.webp',   
+            'assets/png/8-ea087ede.webp',   
+            'assets/png/14-a397ff6b.webp'    
+        ];
+        
+        let selectedAvatarUrl = AVATAR_PATHS[0]; 
+        
+        // Helper functions
+        // Since we are using the document ID as UID, we use the numericalUID from Firestore for display
+        
+        function formatLastLogin(timestamp) {
+            if (!timestamp) return 'N/A';
+            try {
+                // Handle Firebase Timestamp object or standard Date object
+                const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp); 
+                return date.toLocaleString();
+            } catch (e) {
+                return 'N/A';
+            }
+        }
+        
+        // 🚨 UPDATED: Simplified update logic based purely on Firestore data
+        function updateProfileUI(data = {}) {
+            
+            currentUserData = data;
+
+            // UID Logic: Display the Numerical UID stored in Firestore
+            let displayUID = data.numericalUID 
+                ? String(data.numericalUID).substring(0, 6).padStart(6, '0') 
+                : '...';
+            
+            // Username Logic: Use Firestore data
+            let username = data.username && data.username.trim() !== '' 
+                ? data.username.trim()
+                : 'User Loading...';
+            
+            // UI Updates
+            document.getElementById('profile-username').textContent = username;
+            document.getElementById('profile-uid').textContent = `UID | ${displayUID}`; 
+            
+            // Last Login Handling
+            const lastLogin = formatLastLogin(data.lastLogin);
+            document.getElementById('profile-last-login').textContent = `Last login: ${lastLogin}`;
+            
+            // Balance Handling
+            const balance = parseFloat(data.balance || 0).toFixed(2);
+            document.getElementById('total-balance').textContent = `Total balance: ₹${balance.toLocaleString('en-IN')}`;
+
+            // Avatar & Notification
+            const currentAvatarUrl = data.avatarUrl || AVATAR_PATHS[0];
+            document.getElementById('profile-avatar').src = currentAvatarUrl;
+            
+            const notificationCount = data.notificationCount !== undefined ? data.notificationCount : 0; 
+            const notificationEl = document.getElementById('notification-count');
+            if (notificationEl) {
+                notificationEl.textContent = notificationCount;
+                notificationEl.style.display = notificationCount > 0 ? 'inline' : 'none';
+            }
+
+            // Update modal tracker
+            selectedAvatarUrl = currentAvatarUrl;
+            
+            // Remove loading class once data is available
+            const openEditModalBtn = document.getElementById('open-edit-modal');
+            if (openEditModalBtn) {
+                openEditModalBtn.classList.remove('loading');
+            }
+        }
+
+        // 🚨 CORE FUNCTION: Check LocalStorage and fetch user data 🚨
+        function loadUserProfile() {
+            const uid = localStorage.getItem('loggedInUserUID');
+            
+            if (!uid) {
+                // 1. User not logged in, redirect
+                console.log("User not logged in. Redirecting to login.html");
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            currentAuthUserUID = uid;
+
+            // Display initial loading state
+            updateProfileUI({}); 
+
+            const userDocRef = db.collection('users').doc(uid);
+            
+            // Real-time listener (onSnapshot)
+            userDocRef.onSnapshot((docSnap) => {
+                const data = docSnap.exists ? docSnap.data() : null;
+                
+                if (data) {
+                    // 2. Data found, update UI
+                    updateProfileUI(data);  
+                } else {
+                    // 3. UID in localStorage but no document found (session invalid)
+                    console.error("UID in localStorage is invalid. Redirecting.");
+                    localStorage.removeItem('loggedInUserUID'); 
+                    window.location.href = 'login.html';
+                }
+
+            }, error => {
+                console.error("Error fetching user data:", error);
+                alert("Error loading profile data from database. Please check Firestore rules.");
+                // We keep the user on the page in case of a temporary network issue
+            });
+        }
+        
+        // --- MODAL & EDIT PROFILE LOGIC (Unchanged, uses currentAuthUserUID) ---
+
+        function setupAvatarGrid() {
+            const grid = document.getElementById('avatar-grid');
+            grid.innerHTML = ''; 
+            
+            const currentSelected = selectedAvatarUrl; 
+
+            AVATAR_PATHS.forEach(url => {
+                const option = document.createElement('div');
+                option.className = 'avatar-option';
+                option.dataset.avatarUrl = url;
+                
+                if (url === currentSelected) {
+                    option.classList.add('selected');
+                }
+                
+                option.innerHTML = `<img src="${url}" alt="Avatar">`;
+                
+                option.addEventListener('click', () => {
+                    document.querySelectorAll('.avatar-option').forEach(item => {
+                        item.classList.remove('selected');
+                    });
+                    option.classList.add('selected');
+                    selectedAvatarUrl = url; 
+                });
+                
+                grid.appendChild(option);
+            });
+        }
+        
+        function openEditModal() {
+            const openEditModalBtn = document.getElementById('open-edit-modal');
+            
+            if (openEditModalBtn && openEditModalBtn.classList.contains('loading')) {
+                alert("Profile data is still loading. Please wait a moment for the data to sync.");
+                return;
+            }
+            
+            const modal = document.getElementById('editProfileModal');
+            const usernameInput = document.getElementById('edit-username');
+            
+            // Set initial values
+            usernameInput.value = currentUserData.username || '';
+            selectedAvatarUrl = currentUserData.avatarUrl || AVATAR_PATHS[0];
+            
+            // Setup the grid and show the modal
+            setupAvatarGrid(); 
+            
+            if (modal) modal.style.display = 'block';
+        }
+
+        function closeEditModal() {
+            const modal = document.getElementById('editProfileModal');
+            if (modal) modal.style.display = 'none';
+        }
+        
+        async function saveProfileChanges() {
+            const saveButton = document.getElementById('save-profile-button');
+            const newUsername = document.getElementById('edit-username').value.trim();
+            const newAvatarUrl = selectedAvatarUrl;
+
+            if (!currentAuthUserUID) {
+                alert("Session expired. Please log in again.");
+                handleLogout(); // Redirect to login
+                return;
+            }
+
+            if (newUsername.length < 3 || newUsername.length > 20) {
+                alert("Username must be between 3 and 20 characters.");
+                return;
+            }
+            
+            const usernameChanged = newUsername !== currentUserData.username;
+            const avatarChanged = newAvatarUrl !== (currentUserData.avatarUrl || AVATAR_PATHS[0]);
+            
+            if (!usernameChanged && !avatarChanged) {
+                closeEditModal();
+                return;
+            }
+            
+            saveButton.textContent = 'Saving...';
+            saveButton.disabled = true;
+
+            try {
+                const userDocRef = db.collection('users').doc(currentAuthUserUID);
+                
+                const updates = {
+                    lastUpdate: firebase.firestore.FieldValue.serverTimestamp() // v8 syntax for server timestamp
+                };
+                if (usernameChanged) {
+                    updates.username = newUsername;
+                }
+                if (avatarChanged) {
+                    updates.avatarUrl = newAvatarUrl;
+                }
+                
+                await userDocRef.update(updates);
+
+                closeEditModal();
+
+            } catch (error) {
+                console.error("Error saving profile:", error);
+                alert("Failed to save profile. Please check your network or Firestore rules.");
+            } finally {
+                saveButton.textContent = 'Save Changes';
+                saveButton.disabled = false;
+            }
+        }
+        
+        // 🚨 LOGOUT FUNCTIONALITY (Updated for Custom Auth) 🚨
+        function handleLogout() {
+            // Clear the custom UID from local storage
+            localStorage.removeItem('loggedInUserUID');
+            console.log("Logged out. Redirecting...");
+            // Redirect to login page
+            window.location.href = 'login.html';
+        }
+
+        // ------------------- DOM CONTENT LOADED -------------------
+        document.addEventListener("DOMContentLoaded", function() {
+            const logoutButton = document.getElementById('logout-button');
+            const navItems = document.querySelectorAll(".bottom-nav .nav-item");
+            
+            const openEditModalBtn = document.getElementById('open-edit-modal');
+            const closeEditModalBtn = document.getElementById('close-edit-modal');
+            const saveProfileBtn = document.getElementById('save-profile-button');
+            const modal = document.getElementById('editProfileModal');
+
+            // --- Modal Event Listeners ---
+            if (openEditModalBtn) openEditModalBtn.addEventListener('click', openEditModal);
+            if (closeEditModalBtn) closeEditModalBtn.addEventListener('click', closeEditModal);
+            if (saveProfileBtn) saveProfileBtn.addEventListener('click', saveProfileChanges);
+            
+            window.addEventListener('click', (event) => {
+                if (event.target === modal) {
+                    closeEditModal();
+                }
+            });
+
+
+            // --- START LOADING USER PROFILE ---
+            loadUserProfile(); // Start the custom login/data fetch process
+
+            // --- LOGOUT FUNCTIONALITY ---
+            if (logoutButton) {
+                logoutButton.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    logoutButton.textContent = 'Logging out...';
+                    logoutButton.disabled = true;
+                    handleLogout(); // Calls the custom logout function
+                });
+            }
+
+            // --- Bottom Nav Active State Logic ---
+            const currentPage = window.location.pathname.split("/").pop() || 'account.html';
+
+            navItems.forEach(item => {
+                const href = item.getAttribute("href");
+                if (href && (href.split("/").pop() === currentPage)) {
+                    item.classList.add("active");
+                } else {
+                    item.classList.remove("active");
+                }
+            });
+        });
+    </script>
+</body>
+</html>
