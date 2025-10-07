@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Russian Club - Gift Center</title>
+
+     <style>
+        /* Global & Reset Styles (Existing CSS...) */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #1a1a1a; /* Dark background */
+            color: #f0f0f0; /* Light text */
+        }
+        .container {
+            /* Max width set to simulate a mobile screen within a larger browser */
+            max-width: 450px;
+            margin: 0 auto;
+            padding: 0;
+            background-color: #1a1a1a;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Define fixed header/footer height for content padding */
+        :root {
+            --header-height: 55px;
+            --footer-height: 60px;
+        }
+/* ------------------- GLASSMORPHIC STICKY HEADER ------------------- */
+.sticky-header {
+    position: fixed;
+    top: 0;
+    /* FIX: Added left: 50% and transform to truly center the fixed header */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 450px; /* Use container max-width to match body/content */
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+
+    /* Glassmorphism effect */
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(12px) saturate(180%);
+    -webkit-backdrop-filter: blur(12px) saturate(180%);
+
+    border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Space between back arrow and title */
+    font-size: 1.2em;
+    font-weight: 800;
+    z-index: 1000;
+    border-radius: 0 0 12px 12px;
+    letter-spacing: 1px;
+
+    height: var(--header-height); /* Use the defined variable for consistent height */
+    padding: 0 15px; /* Added horizontal padding */
+}
+
+/* Header text styling */
+.header-title {
+    line-height: 1.2;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.6);
+    flex-grow: 1; /* Allows title to take available space */
+    text-align: center; /* Center the title text */
+    font-size: 1.2em; /* Adjusted size for better fit */
+    font-weight: 700;
+}
+
+.back-arrow {
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    filter: invert(1) drop-shadow(0 0 2px rgba(255,255,255,0.5));
+    /* Added margin to push title to center */
+    margin-right: 15px;
+}
+
+
+        /* ------------------- MAIN CONTENT AREA ------------------- */
+        .main-content {
+            padding-top: var(--header-height);
+            max-width: 450px;
+            width: 100%;
+            margin: 0 auto;
+            box-sizing: border-box; /* Include padding in width */
+        }
+
+        /* ------------------- TOP POSTER (LOCAL IMAGE) - FIXED ------------------- */
+.gift-top-banner {
+    width: 100%; /* Now takes full width of parent (main-content) */
+    height: 180px;
+    /* Using local path as requested */
+    background-image: url('assets/png/giftbanner.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
+    overflow: hidden;
+    /* Removed horizontal margins and border radius for full-screen effect */
+    margin: 0 0 20px 0;
+    border-radius: 0;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+}
+
+/* ------------------- GIFT INPUT CARD STYLE ------------------- */
+.gift-input-section {
+    padding: 20px;
+    margin: 0 10px 20px 10px; /* Keep side margins for the card */
+    border-radius: 12px;
+    background-color: #252525;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    text-align: center;
+}
+
+.gift-input-section h3 {
+    color: #f0f0f0;
+    font-size: 1.1em;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.gift-input-section p {
+    color: #aaa;
+    font-size: 0.9em;
+    margin-bottom: 20px;
+}
+
+.gift-code-input-wrapper {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.gift-code-input {
+    width: calc(100% - 30px);
+    padding: 12px 15px;
+    border-radius: 8px;
+    border: 1px solid #3a3a3a;
+    background-color: #333;
+    color: #f0f0f0;
+    font-size: 1em;
+    outline: none;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    text-align: center;
+}
+
+.gift-code-input::placeholder {
+    color: #777;
+    text-align: center;
+}
+
+.gift-code-input:focus {
+    border-color: #ffc700;
+    box-shadow: 0 0 0 2px rgba(255, 199, 0, 0.3);
+}
+
+.receive-button {
+    width: 100%;
+    padding: 14px 20px;
+    background: linear-gradient(90deg, #ffdd00, #ffaa00);
+    color: #1a1a1a;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 1.1em;
+    transition: opacity 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+}
+
+.receive-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.receive-button:hover:not(:disabled) {
+    opacity: 0.9;
+    transform: translateY(-2px);
+}
+
+
+/* ------------------- HISTORY SECTION ------------------- */
+h2.history-heading {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.2em;
+    color: #fff;
+    margin: 25px 20px 15px 20px;
+    font-weight: bold;
+    border-left: none;
+    padding-left: 0;
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+}
+
+h2.history-heading img {
+    width: 28px;
+    height: 28px;
+    filter: invert(0.8) sepia(1) saturate(5) hue-rotate(30deg);
+}
+
+
+.no-data-illustration {
+    text-align: center;
+    padding: 40px 20px;
+    color: #888;
+    font-size: 0.9em;
+    margin-top: 20px;
+    background-color: #252525;
+    margin: 0 10px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    min-height: 150px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.no-data-illustration img {
+    width: 150px;
+    height: auto;
+    opacity: 0.4;
+    margin-bottom: 15px;
+    filter: grayscale(100%) brightness(50%);
+}
+.no-data-illustration .no-data-text {
+    color: #666;
+    font-weight: 500;
+}
+
+.history-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 10px;
+}
+
+.history-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    margin-bottom: 8px;
+    border-radius: 10px;
+    background-color: #2b2b2b;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.gift-details {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    /* Allow details to take most of the space */
+    flex-grow: 1; 
+}
+
+.gift-name {
+    font-weight: bold;
+    color: #ffc700;
+    font-size: 1em;
+}
+
+/* Removed .gift-code class styles as it is no longer shown */
+
+/* NEW: Date/Time style */
+.claim-date {
+    font-size: 0.75em;
+    color: #777;
+    margin-top: 4px; /* Space from amount above it */
+}
+
+.gift-status {
+    font-weight: bold;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 0.8em;
+    /* Ensure status stays to the right */
+    align-self: flex-start;
+    margin-left: 10px;
+}
+
+.status-success {
+    background-color: #1e4d29;
+    color: #5cb85c;
+}
+
+.status-failed {
+    background-color: #4d1e1e;
+    color: #d9534f;
+}
+
+/* ------------------- TOAST NOTIFICATION CSS (NEW) ------------------- */
+#toast-container {
+    position: fixed;
+    top: 65px; /* Just below the fixed header */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 400px;
+    z-index: 2000; /* High Z-index to be on top */
+}
+
+.toast {
+    padding: 12px 20px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    font-size: 0.95em;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    opacity: 0;
+    transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out;
+    transform: translateY(-20px);
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.toast.success {
+    background-color: #28a745; /* Green */
+    color: white;
+}
+
+.toast.error {
+    background-color: #dc3545; /* Red */
+    color: white;
+}
+</style>
+</head>
+<body>
+
+    <div class="container">
+
+        <div class="sticky-header">
+            <img src="https://img.icons8.com/ios-glyphs/30/ffffff/back--v1.png" alt="Back" class="back-arrow" onclick="history.back()">
+            <div class="header-title">Gift Center</div>
+            <div style="width: 24px; height: 24px;"></div>
+        </div>
+        
+        <div id="toast-container"></div>
+        <div class="main-content">
+
+            <div class="gift-top-banner">
+                </div>
+
+            <div class="gift-input-section">
+                <h3 id="welcome-greeting">Welcome!</h3> 
+                <p>We have a special gift for you.</p>
+                <p>Please enter the gift code below</p>
+                <div class="gift-code-input-wrapper">
+                    <input type="text" id="giftCodeInput" class="gift-code-input" placeholder="Please enter gift code">
+                </div>
+                <button class="receive-button" onclick="claimGift()">Receive</button>
+            </div>
+
+            <h2 class="history-heading">
+                <img src="https://img.icons8.com/ios-filled/50/ffc700/time-machine.png" alt="History Icon">
+                Claim History
+            </h2>
+
+            <div class="no-data-illustration" id="claim-history-list">
+                <img src="https://img.icons8.com/ios-filled/100/333333/stack-of-papers.png" alt="No Data">
+                <div class="no-data-text">No previous claims found.</div>
+            </div>
+        </div>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<script>
+    // --- FIREBASE CONFIGURATION (Use your actual config) ---
+    var firebaseConfig = {
+        // !!! IMPORTANT: CHANGE THIS TO YOUR ACTUAL CONFIG !!!
+        apiKey: "AIzaSyDlEY_2bDv25T5GTCzTEk7sQIZrAxh5irc", 
+        authDomain: "russian-club.firebaseapp.com",
+        projectId: "russian-club",
+        storageBucket: "russian-club.appspot.com",
+        messagingSenderId: "1096848291195",
+        appId: "1:1096848291195:web:2c8c12e9c6c913f83210c7",
+    };
+
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
+
+    const db = firebase.firestore();
+
+    // --- TOAST NOTIFICATION FUNCTION ---
+    function showToast(message, type = 'success') {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.textContent = message;
+        
+        // Remove existing toasts to prevent clutter, keeping only the latest one
+        container.innerHTML = ''; 
+        container.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.classList.add('show');
+        }, 10);
+
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => {
+                container.removeChild(toast);
+            }, 400); 
+        }, 4000); 
+    }
+
+    // --- HELPER FUNCTIONS ---
+    function getLoggedInUserUID() {
+        // NOTE: In a real app, replace this with firebase.auth().currentUser.uid
+        const uid = localStorage.getItem('loggedInUserUID');
+        // Fallback for testing
+        return uid || 'TEST_USER_A1B2C3D4E5'; 
+    }
+
+    function formatCurrency(amount) {
+        return `₹${Number(amount).toLocaleString('en-IN', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        })}`;
+    }
+
+    // Function to format timestamp into readable date and time
+    function formatDateTime(timestamp) {
+        const date = new Date(timestamp);
+        const options = { 
+            year: 'numeric', 
+            month: 'short', 
+            day: 'numeric', 
+            hour: '2-digit', 
+            minute: '2-digit', 
+            hour12: true 
+        };
+        return date.toLocaleString('en-IN', options);
+    }
+
+    function toggleLoading(isLoading) {
+        const button = document.querySelector('.receive-button');
+        const input = document.getElementById('giftCodeInput');
+        if (isLoading) {
+            button.disabled = true;
+            button.textContent = 'Processing...';
+            input.disabled = true;
+        } else {
+            button.disabled = false;
+            button.textContent = 'Receive';
+            input.disabled = false;
+        }
+    }
+
+    let historyItems = []; 
+
+    /**
+     * Renders the list based on the globally updated historyItems array.
+     * Sorts the history to ensure the latest item is always on top.
+     */
+    function renderHistoryList() {
+        let historyContainer = document.getElementById('claim-history-list');
+
+        const uid = getLoggedInUserUID();
+        
+        // Filter: Show only successful claims of the current user AND all failed attempts 
+        const userHistory = historyItems.filter(item => item.uid === uid || item.status === 'failed'); 
+        
+        // **CRITICAL:** Sort by timestamp descending (newest first)
+        userHistory.sort((a, b) => b.timestamp - a.timestamp); 
+
+        if (userHistory.length === 0) {
+            historyContainer.innerHTML = `
+                <img src="https://img.icons8.com/ios-filled/100/333333/stack-of-papers.png" alt="No Data">
+                <div class="no-data-text">No previous claims found.</div>
+            `;
+            historyContainer.classList.add('no-data-illustration');
+            historyContainer.classList.remove('history-list');
+            return;
+        }
+
+        if (historyContainer.classList.contains('no-data-illustration')) {
+            historyContainer.classList.remove('no-data-illustration');
+            historyContainer.classList.add('history-list');
+        }
+
+        historyContainer.innerHTML = ''; 
+        
+        userHistory.forEach(item => {
+            const listItem = document.createElement('li');
+            listItem.className = 'history-item';
+            
+            const displayAmount = item.amount && item.amount > 0 ? formatCurrency(item.amount) : 'N/A';
+            const giftName = item.status === 'success' ? `${displayAmount} Bonus` : 'Claim Failed';
+            const statusClass = item.status === 'success' ? 'status-success' : 'status-failed';
+            const statusText = item.status === 'success' ? 'Claimed' : 'Failed';
+            
+            // Format the date/time for display
+            const dateTimeString = item.timestamp ? formatDateTime(item.timestamp) : 'Date N/A';
+
+            listItem.innerHTML = `
+                <div class="gift-details">
+                    <span class="gift-name">${giftName}</span>
+                    <span class="claim-date">${dateTimeString}</span> 
+                </div>
+                <span class="gift-status ${statusClass}">${statusText}</span>
+            `;
+
+            // Prepend the new item to the container to ensure newest is always at the top
+            historyContainer.appendChild(listItem);
+        });
+    }
+
+    // Function to add new claim to local history and re-render
+    function updateHistoryUI(code, amount, status) {
+        const newItem = {
+            code: code,
+            amount: amount,
+            status: status,
+            // Use current time for newly claimed items
+            timestamp: Date.now(), 
+            uid: getLoggedInUserUID()
+        };
+
+        // Add the new item to the global list
+        historyItems.push(newItem);
+        // Re-render the entire list, which includes a sorting step
+        renderHistoryList();
+    }
+
+
+    // --- MAIN REDEEM FUNCTION ---
+    async function claimGift() {
+        const uid = getLoggedInUserUID();
+        if (!uid) {
+            showToast('Please log in first to claim a gift.', 'error');
+            return;
+        }
+
+        const input = document.getElementById('giftCodeInput');
+        const code = input.value.trim().toUpperCase();
+
+        if (code === "") {
+            showToast("Please enter a gift code.", 'error');
+            return;
+        }
+
+        toggleLoading(true);
+        let claimedAmount = 0; 
+        let claimSuccess = false; 
+
+        try {
+            await db.runTransaction(async (transaction) => {
+                const giftRef = db.collection('gift_codes').doc(code);
+                const giftDoc = await transaction.get(giftRef);
+
+                if (!giftDoc.exists) {
+                    throw new Error("Invalid Code: This gift code does not exist.");
+                }
+
+                let giftData = giftDoc.data();
+                
+                // Use safe defaults: 0 for number, [] for array
+                const currentClaims = giftData.currentUses || 0; 
+                const maxClaims = giftData.maxUses || 0; 
+                const claimedByArray = giftData.claimed_by || [];
+                
+                // 1. Check if the code is active
+                if (!giftData.is_active && !giftData.isActive) { 
+                    throw new Error("Inactive: This gift code is currently inactive.");
+                }
+                
+                // 2. GLOBAL MAX LIMIT Check (Total claims)
+                if (maxClaims > 0 && currentClaims >= maxClaims) {
+                    throw new Error("Limit Exceeded: This gift code has reached its maximum number of claims.");
+                }
+
+                // 3. PER-USER LIMIT Check (1 code, 1 user, 1 claim)
+                if (claimedByArray.includes(uid)) {
+                    throw new Error("Claimed: This code has already been claimed by your account."); 
+                }
+                
+                claimedAmount = giftData.amount; 
+
+                // 4. Update User's Balance
+                const userRef = db.collection('users').doc(uid);
+                const userDoc = await transaction.get(userRef);
+
+                if (!userDoc.exists) {
+                    throw new Error("User Error: Could not find user account. (UID or 'users' collection error)");
+                }
+
+                const currentBalance = userDoc.data().balance || 0;
+                const newBalance = currentBalance + claimedAmount;
+
+                // Create history entry 
+                const historyEntry = {
+                    uid: uid,
+                    amount: claimedAmount,
+                    // Use new Date() for Firestore to handle Timestamp correctly
+                    timestamp: new Date(), 
+                    status: 'success',
+                    code: code 
+                };
+
+                // Perform updates: update user balance
+                transaction.set(userRef, { balance: newBalance }, { merge: true });
+
+                // Update gift code document
+                transaction.set(giftRef, {
+                    currentUses: firebase.firestore.FieldValue.increment(1), 
+                    claimed_by: firebase.firestore.FieldValue.arrayUnion(uid), 
+                    claimed_history: firebase.firestore.FieldValue.arrayUnion(historyEntry) 
+                }, { merge: true }); 
+                
+                claimSuccess = true;
+            });
+
+            // Success handling outside of transaction
+            if (claimSuccess) {
+                showToast(`SUCCESS! You received ${formatCurrency(claimedAmount)} bonus. Your balance has been updated.`, 'success');
+                // Update local UI
+                updateHistoryUI(code, claimedAmount, 'success'); 
+            }
+
+        } catch (error) {
+            console.error("Redeem Failed (Full Error):", error);
+            
+            let errorMessage = "An unexpected error occurred.";
+            if (error.message.includes("Invalid Code")) {
+                errorMessage = "Invalid Gift Code. Please try again.";
+            } else if (error.message.includes("Limit Exceeded")) {
+                errorMessage = "This code has reached its maximum claim limit.";
+            } else if (error.message.includes("Claimed")) {
+                errorMessage = "This code has already been claimed by your account."; 
+            } else if (error.message.includes("Inactive")) {
+                errorMessage = "This gift code is inactive.";
+            } else if (error.message.includes("User Error")) {
+                errorMessage = "User account error. Please try logging in again.";
+            } else {
+                errorMessage = `Error: ${error.message}`;
+            }
+
+            showToast(`REDEEM FAILED: ${errorMessage}`, 'error');
+            
+            // Add failed attempt to local history
+            updateHistoryUI(code, 0, 'failed'); 
+            
+        } finally {
+            toggleLoading(false);
+            input.value = ''; 
+        }
+    }
+
+    // --- FUNCTION TO FETCH USER DATA ---
+    async function fetchUserName() {
+        const uid = getLoggedInUserUID();
+        const greetingElement = document.getElementById('welcome-greeting');
+        
+        if (!uid) {
+            greetingElement.textContent = 'Welcome!';
+            return;
+        }
+
+        try {
+            const userRef = db.collection('users').doc(uid);
+            const userDoc = await userRef.get();
+
+            if (userDoc.exists) {
+                const userData = userDoc.data();
+                const userName = userData.username || userData.name || 'Player'; 
+                greetingElement.textContent = `Hello, ${userName}!`;
+            } else {
+                greetingElement.textContent = 'Hello, User!'; 
+            }
+        } catch (error) {
+            console.error("Error fetching user data:", error);
+            greetingElement.textContent = 'Hello, Friend!'; 
+        }
+    }
+
+
+    // --- LOAD HISTORY ON PAGE LOAD (FETCHING FROM ALL GIFT CODE DOCS) ---
+    async function loadClaimHistory() {
+        const uid = getLoggedInUserUID();
+        
+        try {
+            // Fetch ALL gift codes
+            const giftCodesSnapshot = await db.collection('gift_codes').get();
+            
+            let allClaims = [];
+            
+            giftCodesSnapshot.docs.forEach(giftDoc => {
+                const giftData = giftDoc.data();
+                const code = giftDoc.id; 
+                
+                const claimedHistory = giftData.claimed_history || []; 
+                
+                if (Array.isArray(claimedHistory)) {
+                    
+                    claimedHistory.forEach(claim => {
+                        // Include claim if it belongs to the current user OR if it was a failed attempt (uid is not reliable in failure)
+                        if (claim.uid === uid || claim.status === 'failed') {
+                            allClaims.push({
+                                code: code,
+                                amount: claim.amount || 0,
+                                status: claim.status,
+                                // Safely convert Firestore Timestamp or Date object to JS timestamp
+                                timestamp: claim.timestamp ? (claim.timestamp.toDate ? claim.timestamp.toDate().getTime() : new Date(claim.timestamp).getTime()) : Date.now(),
+                                uid: claim.uid 
+                            });
+                        }
+                    });
+                }
+            });
+            
+            // Store all fetched claims globally
+            historyItems = allClaims;
+            
+            // Render the list (which includes the final sorting)
+            renderHistoryList();
+            
+        } catch(error) {
+            console.error("Error loading claim history:", error);
+            showToast('Failed to load history.', 'error');
+        }
+    }
+
+
+    document.addEventListener("DOMContentLoaded", function() {
+        // 1. Fetch and display the user's name
+        fetchUserName();
+        
+        // 2. Load History from ALL Gift Code Documents
+        loadClaimHistory();
+    });
+</script>
+</body>
+</html>

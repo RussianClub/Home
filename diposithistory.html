@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deposit History</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    
+    <style>
+        /* Global & Reset Styles (Matching Theme) */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #1a1a1a; 
+            color: #f0f0f0; 
+        }
+        .container {
+            max-width: 450px; 
+            margin: 0 auto;
+            padding: 0;
+            background-color: #1a1a1a;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Variables for Theme Consistency */
+        :root {
+            --header-height: 55px; 
+            --accent-gold: #ffc700;
+            --dark-bg-card: #252525;
+            /* Note: Pink-red gradient removed as it's not used in this page's main theme */
+        }
+        
+        /* ------------------- GLASSMORPHIC STICKY HEADER ------------------- */
+        .sticky-header {
+            position: fixed;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 450px; 
+            box-sizing: border-box; 
+
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(12px) saturate(180%);
+            -webkit-backdrop-filter: blur(12px) saturate(180%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between; 
+            font-size: 1.2em;
+            font-weight: 800;
+            z-index: 1000;
+            border-radius: 0 0 12px 12px;
+
+            height: var(--header-height); 
+            padding: 0 15px; 
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            width: 30px; 
+            text-align: left;
+            padding: 0;
+        }
+
+        .header-title {
+            font-size: 1em;
+            font-weight: 700;
+            text-align: center;
+            flex-grow: 1;
+        }
+
+        .header-spacer { 
+            width: 30px; 
+        }
+        
+        /* ------------------- MAIN CONTENT AREA ------------------- */
+        .main-content {
+            padding-top: var(--header-height);
+            max-width: 450px;
+            width: 100%;
+            margin: 0 auto;
+            box-sizing: border-box; 
+            padding-bottom: 30px;
+        }
+        
+        /* ------------------- HISTORY STYLES ------------------- */
+
+        .history-header-box {
+            margin: 15px 15px 15px 15px;
+            padding: 0 0 10px 0;
+        }
+        .history-header {
+            font-size: 1.1em;
+            color: var(--accent-gold);
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: space-between; 
+        }
+        .history-header i {
+            margin-right: 8px;
+            color: #5cb85c; /* Using a green/success color for Deposits */
+        }
+        
+        .history-list {
+            list-style: none;
+            padding: 0;
+            margin: 0 15px; 
+        }
+
+        .history-item-card {
+            background-color: var(--dark-bg-card);
+            border-radius: 12px;
+            margin-bottom: 12px;
+            padding: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+            display: flex;
+            flex-direction: column;
+            font-size: 0.9em;
+        }
+
+        .history-top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        /* Amount is yellow/gold */
+        .history-amount {
+            font-weight: bold;
+            color: #5cb85c; /* Using green for deposited amount */
+            font-size: 1.2em;
+        }
+
+        /* Status is colored by status class */
+        .history-status-right {
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        /* Grid for details (Left/Right alignment inside the card) */
+        .history-details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr; 
+            gap: 5px 10px;
+            color: #aaa;
+            padding-top: 5px; 
+            border-top: 1px dashed #333;
+        }
+
+        .grid-label {
+            color: #ccc;
+            font-weight: 500;
+        }
+
+        /* Value color is now WHITE for Time and Order No. */
+        .grid-value {
+            text-align: right;
+            color: #fff; 
+            font-weight: normal; 
+            word-break: break-all;
+        }
+        
+        /* Making Type value a bit more prominent */
+        .grid-label.type + .grid-value {
+            font-weight: bold;
+            color: var(--accent-gold); 
+        }
+
+
+        /* Status Color Styles */
+        .status-success, .status-complete { 
+            color: #5cb85c; /* Green for Success/Complete */
+        }
+        .status-rejected {
+            color: #d9534f; /* Red for Rejected/Failed */
+        }
+        .status-processing, .status-pending {
+            color: var(--accent-gold); /* Gold for Processing/Pending */
+        }
+
+        .no-history {
+            text-align: center;
+            color: #777;
+            padding: 20px 0;
+            font-size: 0.9em;
+            margin: 0 15px;
+        }
+        
+        /* ------------------- TOAST NOTIFICATION STYLES ------------------- */
+        #toast-container {
+            position: fixed; 
+            top: 65px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            z-index: 5000 !important; 
+            width: 90%; 
+            max-width: 400px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <div class="sticky-header">
+            <button class="icon-btn" onclick="goBack()"><i class="fa fa-arrow-left"></i></button>
+            <div class="header-title">Deposit History</div>
+            <div class="header-spacer"></div> 
+        </div>
+
+        <div class="main-content">
+
+            <div class="history-header-box">
+                <div class="history-header">
+                    <div class="history-header-left">
+                        <i class="fa fa-arrow-circle-up"></i> All Deposit Requests
+                    </div>
+                    <i class="fa fa-sync refresh-icon" onclick="fetchDepositHistory()"></i>
+                </div>
+            </div>
+
+            <ul class="history-list" id="depositHistoryList">
+                </ul>
+            <div id="noHistoryMessage" class="no-history" style="display: none;">Loading history...</div>
+
+        </div>
+        
+    </div>
+
+    <div id="toast-container"></div> 
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    
+    <script type="module">
+        // --- CONSTANTS & CONFIG ---
+        // **IMPORTANT:** Using the config from your withdrawalhistory.html
+        const firebaseConfig = {
+            apiKey: "AIzaSyDlEY_2bDv25T5GTCzTEk7sQIZrAxh5irc", 
+            authDomain: "russian-club.firebaseapp.com",
+            projectId: "russian-club",
+            storageBucket: "russian-club.firebasestorage.app",
+            messagingSenderId: "659659196153",
+            appId: "1:659659196153:web:d6aaa4650fcff3d5fa0428",
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const db = firebase.firestore();
+
+        // --- DOM Elements ---
+        const historyListEl = document.getElementById('depositHistoryList');
+        const noHistoryMessageEl = document.getElementById('noHistoryMessage');
+        
+        let currentUID = null;
+
+        // --- HELPER FUNCTIONS ---
+
+        function getLoggedInUserUID() {
+            // Get UID from localStorage, consistent with other pages
+            const uid = localStorage.getItem('loggedInUserUID');
+            return uid;
+        }
+
+        function formatCurrency(amount) {
+            return Number(amount).toLocaleString('en-IN', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        }
+        
+        function goBack() {
+            history.back();
+        }
+        window.goBack = goBack; 
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            toast.style.padding = '12px 20px';
+            toast.style.marginBottom = '10px';
+            toast.style.borderRadius = '8px';
+            toast.style.fontSize = '0.95em';
+            toast.style.fontWeight = '600';
+            toast.style.color = 'white';
+            toast.style.textAlign = 'center';
+            toast.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.4)';
+            toast.style.background = type === 'success' ? '#28a745' : '#dc3545';
+            
+            toast.textContent = message;
+            container.prepend(toast); 
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => {
+                    container.removeChild(toast);
+                }, 400); 
+            }, 4000); 
+        }
+
+        // --- CORE FETCH AND RENDER LOGIC ---
+
+        async function fetchDepositHistory() {
+            if (!currentUID) {
+                historyListEl.innerHTML = '';
+                noHistoryMessageEl.style.display = 'block';
+                noHistoryMessageEl.textContent = 'Please log in to view history.';
+                return;
+            }
+
+            historyListEl.innerHTML = '';
+            noHistoryMessageEl.style.display = 'block';
+            noHistoryMessageEl.textContent = 'Loading deposit history...';
+
+            try {
+                // *** KEY CHANGE: Fetching from 'deposit_requests' collection ***
+                const snapshot = await db.collection('deposit_requests')
+                    .where('uid', '==', currentUID)
+                    .orderBy('timestamp', 'desc')
+                    .get();
+
+                renderHistory(snapshot.docs);
+            } catch (error) {
+                console.warn("⚠️ Index missing or error in fetching history. Switching to safe mode fallback.", error);
+                
+                try {
+                    // Fallback: fetch without orderBy
+                    const snapshot = await db.collection('deposit_requests')
+                        .where('uid', '==', currentUID)
+                        .get();
+
+                    // Manually sort by timestamp DESC (latest first)
+                    const sortedDocs = snapshot.docs.sort((a, b) => {
+                        const t1 = a.data().timestamp?.toMillis?.() || 0;
+                        const t2 = b.data().timestamp?.toMillis?.() || 0;
+                        return t2 - t1; // latest first
+                    });
+
+                    renderHistory(sortedDocs);
+                } catch (fallbackError) {
+                    console.error("❌ Fallback failed:", fallbackError);
+                    noHistoryMessageEl.style.display = 'block';
+                    noHistoryMessageEl.textContent = 'Failed to load deposit history.';
+                    showToast("Failed to load deposit history.", 'error');
+                }
+            }
+        }
+        window.fetchDepositHistory = fetchDepositHistory;
+
+
+        function renderHistory(docs) {
+            historyListEl.innerHTML = '';
+
+            if (!docs || docs.length === 0) {
+                noHistoryMessageEl.style.display = 'block';
+                noHistoryMessageEl.textContent = 'No deposit history found.';
+                return;
+            }
+
+            noHistoryMessageEl.style.display = 'none';
+
+            docs.forEach(doc => {
+                const item = doc.data();
+                
+                const rawStatus = item.status?.toLowerCase() || 'unknown';
+                
+                let statusClassBase;
+                let statusText;
+                
+                if (rawStatus === 'complete' || rawStatus === 'success') {
+                    statusClassBase = 'success';
+                    statusText = 'Success'; // Changed from 'Complete' to 'Success' for deposit clarity
+                } else if (rawStatus === 'rejected' || rawStatus === 'failed') {
+                    statusClassBase = 'rejected';
+                    statusText = 'Failed'; // Changed from 'Rejected' to 'Failed'
+                } else if (rawStatus === 'processing' || rawStatus === 'pending') {
+                    statusClassBase = 'pending';
+                    statusText = 'Pending';
+                } else {
+                    statusClassBase = rawStatus; 
+                    statusText = rawStatus.charAt(0).toUpperCase() + rawStatus.slice(1);
+                }
+                
+                const statusClass = `status-${statusClassBase}`;
+                
+                // Format Date and Time
+                const date = item.timestamp?.toDate?.() || new Date();
+                const dateTimeString = `${date.getDate().toString().padStart(2, '0')}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getFullYear()} ${date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })}`;
+                
+                // *** KEY CHANGE: Displaying Channel Name and UTR ***
+                // Use channelName (like SG Pay Services) and UTR Reference
+                let typeValue = item.channelName || (item.channel?.toUpperCase?.() || 'N/A');
+
+                const listItem = document.createElement('li');
+                listItem.className = 'history-item-card';
+                
+                // HTML structure for the card/grid layout
+                listItem.innerHTML = `
+                    <div class="history-top-row">
+                        <span class="history-amount">₹${formatCurrency(item.amount || 0)}</span>
+                        <span class="history-status-right ${statusClass}">${statusText}</span>
+                    </div>
+                    
+                    <div class="history-details-grid">
+                        <span class="grid-label type">Channel</span>
+                        <span class="grid-value type-value">${typeValue}</span>
+                        
+                        <span class="grid-label">Ref ID (UTR)</span>
+                        <span class="grid-value order-no-value">${item.utrReference || 'N/A'}</span>
+
+                        <span class="grid-label">Time</span>
+                        <span class="grid-value time-value">${dateTimeString}</span>
+                        
+                        <span class="grid-label">Order No.</span>
+                        <span class="grid-value order-no-value">${item.order_number || doc.id}</span>
+                    </div>
+                `;
+                
+                historyListEl.appendChild(listItem);
+            });
+        }
+
+
+        // --- INITIALIZATION ---
+        document.addEventListener("DOMContentLoaded", function() {
+            currentUID = getLoggedInUserUID();
+            
+            if (!currentUID) {
+                noHistoryMessageEl.textContent = 'Please log in to view history.';
+                showToast('User not logged in. Please log in.', 'error');
+            }
+
+            // Call the deposit history fetch function
+            fetchDepositHistory();
+        });
+
+    </script>
+</body>
+</html>
