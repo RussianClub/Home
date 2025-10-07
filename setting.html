@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Russian Club - Settings</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    
+    <style>
+        /* Global & Reset Styles (CSS is unchanged, keeping for completeness) */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #1a1a1a; 
+            color: #f0f0f0; 
+        }
+        .container {
+            max-width: 450px; 
+            margin: 0 auto;
+            padding: 0;
+            background-color: #1a1a1a;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        :root {
+            --header-height: 55px; 
+            --accent-gold: #ffc700;
+            --accent-red: #e50074;
+            --input-bg: rgba(0, 0, 0, 0.3); 
+        }
+        
+        .sticky-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            max-width: 450px; 
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(12px) saturate(180%);
+            -webkit-backdrop-filter: blur(12px) saturate(180%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between; 
+            font-size: 1.5em;  
+            font-weight: 800;   
+            z-index: 1000;
+            border-radius: 0 0 12px 12px;
+            letter-spacing: 1px;
+            height: auto;
+            padding: 8px 12px;
+        }
+
+        .header-text {
+            line-height: 1.2; 
+            text-shadow: 0 2px 6px rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center; 
+            flex-grow: 1; 
+        }
+
+        .header-text span {
+            display: inline-block;
+            padding: 4px 8px;
+            color: white; 
+            font-size: 1.05em;
+        }
+
+        .header-text .russian-color {
+            color: #e50074; 
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 6px 0 0 6px;
+            font-weight: 900;
+        }
+
+        .header-text .club-color {
+            color: white;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 0 6px 6px 0;
+            font-weight: 700;
+            margin-left: -1px;
+        }
+        
+        .icon-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            width: 30px; 
+            text-align: left;
+            padding: 0;
+            z-index: 1001;
+        }
+        .header-spacer {
+            width: 30px; 
+            height: 20px;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            padding-top: calc(var(--header-height) + 10px); 
+            padding-bottom: 30px; 
+            padding-left: 10px;
+            padding-right: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .settings-container {
+            width: 95%; 
+            max-width: 400px; 
+            margin-top: 20px; 
+            padding: 25px 20px; 
+            border-radius: 18px; 
+            background: rgba(255, 255, 255, 0.05); 
+            backdrop-filter: blur(10px) saturate(180%);
+            -webkit-backdrop-filter: blur(10px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+        
+        h2 {
+            text-align: center;
+            color: var(--accent-gold);
+            margin-bottom: 25px;
+            padding-bottom: 8px;
+            font-size: 1.6em; 
+            border-bottom: none; 
+        }
+
+        .input-group {
+            margin-bottom: 18px; 
+            position: relative;
+        }
+        label {
+            display: none; 
+        }
+        
+        .settings-container form input { 
+            width: 100%;
+            padding: 12px 15px; 
+            border: 1px solid rgba(255, 255, 255, 0.3); 
+            border-radius: 10px; 
+            background-color: var(--input-bg); 
+            color: #f0f0f0;
+            font-size: 1em; 
+            box-sizing: border-box; 
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        
+        .settings-container form input:focus {
+            outline: none;
+            border-color: var(--accent-gold); 
+            box-shadow: 0 0 8px rgba(255, 199, 0, 0.5); 
+        }
+        
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%; 
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            z-index: 10;
+            padding: 5px; 
+        }
+        
+        .password-toggle svg {
+            width: 100%;
+            height: 100%;
+            fill: none;
+            stroke: #aaaaaa;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            transition: stroke 0.3s;
+        }
+
+        .password-toggle:hover svg {
+            stroke: var(--accent-gold);
+        }
+
+        .submit-btn {
+            width: 100%;
+            display: block; 
+            text-align: center;
+            padding: 15px; 
+            margin-top: 30px; 
+            background: linear-gradient(90deg, #e50074, #ff0099); 
+            color: white;
+            font-size: 1.1em;
+            font-weight: bold;
+            border: none;
+            border-radius: 30px; 
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s, box-shadow 0.3s;
+            box-shadow: 0 6px 15px rgba(229, 0, 116, 0.4); 
+        }
+        .submit-btn:hover {
+            background: linear-gradient(90deg, #ff0099, #e50074);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(229, 0, 116, 0.6);
+        }
+        .submit-btn:active {
+            transform: scale(0.98);
+        }
+        .submit-btn:disabled {
+            background: #555;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        
+        #message {
+            color: #ffc700;
+            text-align: center;
+            margin-top: 15px;
+            font-weight: bold;
+            display: none;
+        }
+        .message-success {
+            color: #28a745; 
+            display: block !important;
+        }
+        .message-error {
+            color: #ffc700; 
+            display: block !important;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <div class="sticky-header">
+            <button class="icon-btn" onclick="goBack()"><i class="fa fa-arrow-left"></i></button>
+            
+            <div class="header-text">
+                <span class="russian-color">RUSSIAN</span><span class="club-color">CLUB</span>
+            </div>
+            
+            <div class="header-spacer"></div>
+        </div>
+
+        <div class="main-content">
+            <div class="settings-container">
+                <h2>Change Password</h2>
+                
+                <form id="passwordForm">
+                    <div class="input-group">
+                        <label for="currentPassword">Current Password</label>
+                        <input type="password" id="currentPassword" placeholder="Enter Current Password" required>
+                        <span class="password-toggle" onclick="toggleVisibility('currentPassword', this)">
+                             <svg viewBox="0 0 24 24" fill="none" stroke="#aaaaaa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-icon">
+                                 <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.94 3.19M1 1l22 22M12 12a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+                            </svg>
+                        </span>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="newPassword">New Password</label>
+                        <input type="password" id="newPassword" placeholder="Enter New Password (6-16ch)" required pattern=".{6,16}" title="Password must be 6 to 16 characters">
+                        <span class="password-toggle" onclick="toggleVisibility('newPassword', this)">
+                             <svg viewBox="0 0 24 24" fill="none" stroke="#aaaaaa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-icon">
+                                 <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.94 3.19M1 1l22 22M12 12a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+                            </svg>
+                        </span>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="confirmPassword">Confirm New Password</label>
+                        <input type="password" id="confirmPassword" placeholder="Confirm New Password" required>
+                        <span class="password-toggle" onclick="toggleVisibility('confirmPassword', this)">
+                             <svg viewBox="0 0 24 24" fill="none" stroke="#aaaaaa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-icon">
+                                 <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.94 3.19M1 1l22 22M12 12a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+                            </svg>
+                        </span>
+                    </div>
+                    
+                    <button type="submit" class="submit-btn" id="submitBtn">
+                        UPDATE PASSWORD
+                    </button>
+                </form>
+
+                <div id="message"></div>
+            </div>
+        </div>
+        
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
+    
+    <script type="module">
+        // Your Firebase Configuration (You should replace this with your actual config)
+        const firebaseConfig = {
+            apiKey: "AIzaSyDlEY_2bDv25T5GTCzTEk7sQIZrAxh5irc",
+            authDomain: "russian-club.firebaseapp.com",
+            databaseURL: "https://russian-club-default-rtdb.firebaseio.com",
+            projectId: "russian-club",
+            storageBucket: "russian-club.firebasestorage.app",
+            messagingSenderId: "659659196153",
+            appId: "1:659659196153:web:d6aaa4650fcff3d5fa0428",
+            measurementId: "G-5M46DNJ1YP"
+        };
+
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        // Firebase Auth is NOT used, only Firestore is used
+        const db = app.firestore();
+
+        const passwordForm = document.getElementById('passwordForm');
+        const messageDiv = document.getElementById('message');
+        const submitBtn = document.getElementById('submitBtn');
+
+        // --- HASHING FUNCTION (SHA-256) ---
+        // ⚠️ IMPORTANT: Ensure this hashing method EXACTLY matches the method used for saving passwords during registration.
+        function hashPassword(password) {
+             // In a real scenario, you'd use a robust key derivation function like bcrypt/scrypt.
+             // Here, we use a simple SHA-256 for demonstration matching your requirement.
+             // If you used a salt during registration, you MUST use the same salt here.
+             
+             // Assuming no salt is used for this example, just a straight SHA-256 hash.
+             return CryptoJS.SHA256(password).toString(CryptoJS.enc.Hex);
+        }
+
+        function getLoggedInUserUID() {
+            // Since Firebase Auth is avoided, we rely on a stored UID.
+            // You MUST ensure 'loggedInUserUID' is correctly set in localStorage upon login.
+            const uid = localStorage.getItem('loggedInUserUID');
+            return uid;
+        }
+
+        // --- HELPER FUNCTIONS (Unchanged) ---
+        window.goBack = function() {
+            history.back();
+        }
+
+        window.toggleVisibility = function(fieldId, iconElement) {
+            const field = document.getElementById(fieldId);
+            const isPassword = field.type === 'password';
+            
+            field.type = isPassword ? 'text' : 'password';
+
+            if (isPassword) {
+                iconElement.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="#aaaaaa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-icon"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
+            } else {
+                iconElement.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="#aaaaaa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-icon"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.94 3.19M1 1l22 22M12 12a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/></svg>`;
+            }
+        }
+
+        function showMessage(msg, type) {
+            messageDiv.textContent = msg;
+            messageDiv.className = type === 'success' ? 'message-success' : 'message-error'; 
+            setTimeout(() => {
+                messageDiv.className = '';
+                messageDiv.textContent = '';
+            }, 5000); 
+        }
+
+
+        // --- PASSWORD CHANGE LOGIC (Firestore Only) ---
+
+        passwordForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const uid = getLoggedInUserUID();
+
+            if (!uid) {
+                showMessage('Error: User not logged in. Please log in again.', 'error');
+                // Optional: Redirect to login page
+                // setTimeout(() => { window.location.href = 'login.html'; }, 1000);
+                return;
+            }
+
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            // Validation Checks
+            if (newPassword.length < 6 || newPassword.length > 16) {
+                showMessage('New Password must be 6 to 16 characters long.', 'error');
+                return;
+            }
+            if (newPassword !== confirmPassword) {
+                showMessage('New Password and Confirm Password do not match.', 'error');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Updating...';
+
+            try {
+                // 1. Hash the provided current password
+                const currentPasswordHash = hashPassword(currentPassword);
+
+                // 2. Fetch user document from Firestore
+                const userRef = db.collection('users').doc(uid);
+                const userDoc = await userRef.get();
+
+                if (!userDoc.exists) {
+                    throw new Error("User data not found in database.");
+                }
+                
+                const storedPasswordHash = userDoc.data().password; // This should be the HASH
+
+                // 3. Verify Current Password Hash against Stored Hash
+                if (storedPasswordHash !== currentPasswordHash) {
+                    showMessage('Error: Current password is incorrect.', 'error');
+                    return;
+                }
+                
+                // 4. Hash the New Password
+                const newPasswordHash = hashPassword(newPassword);
+
+                // 5. Update the Hashed Password in Firestore
+                await userRef.update({
+                    password: newPasswordHash
+                });
+
+                showMessage('Success! Your password has been updated.', 'success');
+                passwordForm.reset(); 
+
+            } catch (error) {
+                console.error("Password update failed:", error);
+                let displayError = error.message.includes('password') || error.message.includes('User data') ? error.message : "Password update failed. Please check your network.";
+                showMessage(`Update Failed: ${displayError}`, 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'UPDATE PASSWORD';
+            }
+        });
+        
+        // No auth.onAuthStateChanged check since we are not using Firebase Auth
+        document.addEventListener('DOMContentLoaded', () => {
+             if (!getLoggedInUserUID()) {
+                // Assuming 'login.html' is the redirect target if no UID is found in localStorage
+                // window.location.href = 'login.html';
+             }
+        });
+    </script>
+</body>
+</html>

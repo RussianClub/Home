@@ -1,0 +1,1896 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Russian Club - Manager Panel (Firebase Auth Secured)</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    
+    <link rel="stylesheet" href="rajni.css"> 
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+    <script src="firebaseConfig.js"></script> 
+    <style>
+        /* Base CSS for the Eye Icon and Table */
+        .details-icon {
+            cursor: pointer;
+            color: #4CAF50; 
+            font-size: 1.1em;
+            margin-left: 5px;
+            transition: color 0.2s;
+        }
+        .details-icon:hover {
+            color: #79a17a;
+        }
+        .details-cell {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+        }
+        /* Status Badges */
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: bold;
+            display: inline-block;
+            margin-right: 5px; /* Added spacing */
+        }
+        .status-approved { background-color: #2ecc71; color: white; }
+        .status-rejected { background-color: #e74c3c; color: white; }
+        .status-pending { background-color: #f39c12; color: white; }
+        .status-active { background-color: #3498db; color: white; }
+        .status-banned { background-color: #c0392b; color: white; }
+        
+        /* Table Styles */
+        .data-table-container table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        .data-table-container th, .data-table-container td {
+            border: 1px solid #444;
+            padding: 12px 15px;
+            text-align: left;
+            color: #ccc;
+        }
+        .data-table-container th {
+            background-color: #333;
+            color: white;
+            text-transform: uppercase;
+            font-size: 0.9em;
+        }
+        .data-table-container tr:nth-child(even) {
+            background-color: #2a2a2a;
+        }
+        .data-table-container tr:hover {
+            background-color: #383838;
+        }
+        
+        /* Action Buttons */
+        .action-btn {
+            padding: 6px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 2px;
+            transition: background-color 0.2s;
+            white-space: nowrap; /* Prevent buttons from wrapping */
+        }
+        .btn-ban { background-color: #e74c3c; color: white; }
+        .btn-unban { background-color: #2ecc71; color: white; }
+        .btn-password { background-color: #3498db; color: white; }
+        .btn-approve { background-color: #2ecc71; color: white; }
+        .btn-reject { background-color: #f39c12; color: white; }
+        .btn-delete { background-color: #c0392b; color: white; } 
+        .btn-edit-details { background-color: #007bff; color: white; } 
+        .btn-edit-balance { background-color: #ffc700; color: #333; } /* NEW STYLE */
+
+
+        /* --- MODAL STYLES --- */
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 100; 
+            left: 0;
+            top: 0;
+            width: 100%; 
+            height: 100%; 
+            overflow: auto; 
+            background-color: rgba(0,0,0,0.6); 
+        }
+        .modal-content {
+            background-color: #1a1a1a;
+            margin: 10% auto; 
+            padding: 20px;
+            border: 1px solid #888;
+            width: 90%; 
+            max-width: 400px; 
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            color: #f0f0f0;
+        }
+        .close-btn {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close-btn:hover, .close-btn:focus {
+            color: #fff;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .modal-header {
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        .modal-header h2 {
+            margin: 0;
+            color: #ffc700;
+            font-size: 1.5em;
+        }
+        .details-section {
+            background-color: #222;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            white-space: pre-wrap; 
+            word-break: break-all; 
+        }
+        .details-section h4 {
+            color: #4CAF50;
+            margin-top: 0;
+            margin-bottom: 10px; 
+            border-bottom: 1px solid #444;
+            padding-bottom: 5px;
+        }
+        .modal-content p {
+            margin-top: 5px; 
+            margin-bottom: 5px; 
+        }
+        .editing-form-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #444;
+            border-radius: 4px;
+        }
+        .editing-form-group label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #ccc;
+        }
+        .editing-form-group input {
+            padding: 8px;
+            border: 1px solid #555;
+            border-radius: 4px;
+            background-color: #333;
+            color: white;
+        }
+        .editing-form-group input:focus {
+            outline: none;
+            border-color: #ffc700;
+        }
+        .form-section-title {
+            color: #4CAF50;
+            font-size: 1.2em;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 5px;
+        }
+        .no-details-found {
+            color: #e74c3c;
+            font-weight: bold;
+            padding: 10px;
+            background-color: #333;
+            border-radius: 4px;
+        }
+        .view-only-detail-item {
+            padding: 8px 0;
+            border-bottom: 1px dotted #444;
+        }
+        .view-only-detail-item:last-child {
+            border-bottom: none;
+        }
+        .view-only-detail-label {
+            color: #999;
+            display: inline-block;
+            width: 150px;
+            font-weight: normal;
+        }
+        .view-only-detail-value {
+            color: #fff;
+            font-weight: bold;
+            word-break: break-all;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="loginScreen" class="login-screen">
+        <div class="login-container">
+            <div class="logo-text">
+                <span class="russian-color">MANAGER</span><span class="club-color">LOGIN</span>
+            </div>
+
+            <form id="loginForm">
+                <div class="input-group">
+                    <label for="username">Manager Email ID</label>
+                    <input type="email" id="username" required> 
+                </div>
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required>
+                </div>
+                
+                <button type="submit" class="login-btn">Log In</button>
+                <div id="loginMessage"></div>
+            </form>
+        </div>
+    </div>
+
+
+    <div id="dashboardWrapper" class="dashboard-wrapper">
+        
+        <div class="sidebar">
+            <div class="logo-header">
+                <div class="logo-text">
+                    <span class="russian-color">MANAGER</span><span class="club-color">PANEL</span>
+                </div>
+            </div>
+
+            <a href="#" class="nav-link active" data-tab="user-management">
+                <i class="fa fa-users"></i> <span>User Management</span>
+            </a>
+            <a href="#" class="nav-link" data-tab="withdrawal-requests">
+                <i class="fa fa-arrow-circle-down"></i> <span>Withdrawal Requests</span>
+            </a>
+            <a href="#" class="nav-link" data-tab="deposit-history">
+                <i class="fa fa-arrow-circle-up"></i> <span>Deposit History</span>
+            </a>
+            <a href="#" class="nav-link" data-tab="payment-details">
+                <i class="fa fa-credit-card"></i> <span>Payment Details Mngmt</span>
+            </a>
+            <a href="#" class="nav-link" data-tab="bonus-codes">
+                <i class="fa fa-gift"></i> <span>Bonus & Codes</span>
+            </a>
+            </div>
+
+        <div class="main-panel">
+            
+            <div class="header-bar">
+                <h2 id="welcomeMessage">Welcome, Manager!</h2>
+                <div class="search-container">
+                    <input type="text" id="globalSearch" placeholder="Search by UID, Username, UTR, Mobile No., etc...">
+                </div>
+                <button class="logout-btn" onclick="logoutAdmin()">Logout <i class="fa fa-sign-out"></i></button>
+            </div>
+
+            <div id="user-management" class="tab-content active">
+                <div class="data-table-container">
+                    <h3>👥 User Management</h3>
+                    <table id="userTable">
+                        <thead>
+                            <tr>
+                                <th>UID</th>
+                                <th>Username</th>
+                                <th>Mobile No.</th>
+                                <th>Status</th>
+                                <th>Balance (₹)</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="userTableBody">
+                            <tr><td colspan="6" style="text-align: center;">Loading users...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="withdrawal-requests" class="tab-content">
+                <div class="data-table-container">
+                    <h3 style="display: inline-block; margin-right: 15px;">💸 Withdrawal Requests (Pending/Processing)</h3>
+                    
+                    <button class="action-btn btn-reject" onclick="deleteSelectedRows('withdrawal')"><i class="fa fa-trash"></i> Delete Selected</button>
+                    <button class="action-btn btn-reject" onclick="deleteAllRows('withdrawal')" style="margin-left: 5px;"><i class="fa fa-eraser"></i> Clear All</button>
+                    <label for="withdrawalFilter">Filter Status:</label>
+                    <select id="withdrawalFilter">
+                        <option value="pending">Pending/Processing</option>
+                        <option value="completed">Completed</option> 
+                        <option value="rejected">Rejected</option>
+                        <option value="all">All</option>
+                    </select>
+
+                    <table id="withdrawalTable">
+                        <thead>
+                            <tr>
+                                <th><input type="checkbox" onchange="toggleAllCheckboxes(this, 'withdrawal')"></th> <th>Order No.</th>
+                                <th>UID</th> 
+                                <th>Amount (₹)</th>
+                                <th>Method</th> 
+                                <th>Request Time</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="withdrawalTableBody">
+                            <tr><td colspan="7" style="text-align: center;">Loading withdrawal requests...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div id="deposit-history" class="tab-content">
+                <div class="data-table-container">
+                    <h3 style="display: inline-block; margin-right: 15px;">💳 Deposit History</h3>
+                    
+                    <button class="action-btn btn-reject" onclick="deleteSelectedRows('deposit')"><i class="fa fa-trash"></i> Delete Selected</button>
+                    <button class="action-btn btn-reject" onclick="deleteAllRows('deposit')" style="margin-left: 5px;"><i class="fa fa-eraser"></i> Clear All</button>
+                    <label for="depositFilter">Filter Status:</label>
+                    <select id="depositFilter">
+                        <option value="all">All</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Approved">Approved</option>
+                        <option value="Rejected">Rejected</option>
+                    </select>
+
+                    <table id="depositTable">
+                        <thead>
+                            <tr>
+                                <th><input type="checkbox" onchange="toggleAllCheckboxes(this, 'deposit')"></th> <th>Order No.</th>
+                                <th>UID (Numerical)</th>
+                                <th>Amount (₹)</th>
+                                <th>UTR No.</th>
+                                <th>Channel</th>
+                                <th>Time</th>
+                                <th>Actions</th> </tr>
+                        </thead>
+                        <tbody id="depositTableBody">
+                            <tr><td colspan="8" style="text-align: center;">Loading deposit history...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="payment-details" class="tab-content">
+                <div class="data-table-container">
+                    <h3 style="color: var(--accent-gold);">💳 Payment Details Management (Bank Card & UPI)</h3>
+                    
+                    <table id="paymentDetailsTable">
+                        <thead>
+                            <tr>
+                                <th>UID</th> 
+                                <th>Username</th>
+                                <th>Bank Card Details</th>
+                                <th>UPI Details</th>
+                                <th>Last Updated</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="paymentDetailsTableBody">
+                            <tr><td colspan="6" style="text-align: center;">Loading payment details...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div id="bonus-codes" class="tab-content">
+                <div class="data-table-container" style="margin-bottom: 20px;">
+                    <h3 style="color: var(--accent-pink);">🎁 Manual Bonus to User</h3>
+                    
+                    <form id="manualBonusForm">
+                        <div class="input-group">
+                            <label for="bonusUid">User UID (Numerical / ID)</label>
+                            <input type="text" id="bonusUid" required placeholder="Ex: 226519 or user_1">
+                        </div>
+                        <div class="input-group">
+                            <label for="bonusAmount">Bonus Amount (₹)</label>
+                            <input type="number" id="bonusAmount" required min="1" placeholder="Ex: 500">
+                        </div>
+                        <div class="input-group">
+                            <label for="bonusReason">Reason for Bonus</label>
+                            <input type="text" id="bonusReason" required placeholder="Ex: Diwali Special, Compensation, etc.">
+                        </div>
+                        <button type="submit" class="login-btn" style="background-color: #007bff;">
+                            Grant Manual Bonus <i class="fa fa-plus-circle"></i>
+                        </button>
+                        <div id="manualBonusMessage" style="font-weight: bold;"></div>
+                    </form>
+                </div>
+
+                <div class="data-table-container">
+                    <h3 style="color: var(--accent-gold);">🎟️ Gift Code Creation (Automated)</h3>
+                    
+                    <form id="giftCodeForm">
+                        <div class="input-group">
+                            <label for="giftCodeAmount">Amount per Claim (₹)</label>
+                            <input type="number" id="giftCodeAmount" required min="1" placeholder="Ex: 500">
+                        </div>
+                        <div class="input-group">
+                            <label for="giftCodeMaxUses">Maximum Users (Claims Limit)</label>
+                            <input type="number" id="giftCodeMaxUses" required min="1" placeholder="Ex: 5">
+                        </div>
+                        
+                        <button type="submit" class="login-btn" style="grid-column: 1 / 3; background-color: var(--accent-gold); color: var(--dark-bg);">
+                            Generate 15-Digit Gift Code <i class="fa fa-rocket"></i>
+                        </button>
+                        <div id="giftCodeMessage" style="grid-column: 1 / 3; font-weight: bold;"></div>
+                    </form>
+                </div>
+                
+                <div class="data-table-container" style="margin-top: 20px;">
+                    <h3 style="display: inline-block; margin-right: 15px;">📜 Gift Code History</h3>
+                    <button class="action-btn btn-reject" onclick="clearGiftCodeHistory()" style="margin-left: 10px;"><i class="fa fa-eraser"></i> Clear All History</button>
+
+                    <table id="giftCodeHistoryTable">
+                        <thead>
+                            <tr>
+                                <th>Code (15-Digit)</th>
+                                <th>Amount (₹)</th>
+                                <th>Max Users</th>
+                                <th>Claims</th>
+                                <th>Status</th>
+                                <th>Creation Time</th>
+                            </tr>
+                        </thead>
+                        <tbody id="giftCodeTableBody">
+                            <tr><td colspan="6" style="text-align: center;">Loading gift codes...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            </div> 
+    </div>
+
+    <div id="detailsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <div class="modal-header">
+                <h2 id="modalTitle">Details</h2>
+            </div>
+            <div id="modalDetailsContent" class="details-section">
+                </div>
+            <button class="login-btn" onclick="closeModal()" style="width: 100%; margin-top: 15px;">Close</button>
+        </div>
+    </div>
+
+<script>
+    // --- FIREBASE SETUP & AUTHENTICATION LOGIC ---
+    
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // 🛑 CRITICAL: Define your Manager UIDs here. ONLY USERS with these UIDs will be granted access.
+    const ADMIN_UIDS = [
+        '3aVUH6y9eVV6BB67IM9FWkHrN7q2', // ⬅️ Replace this with actual Manager UID!
+        'YOUR_MANAGER_UID_2'  
+    ];
+
+    const loginScreen = document.getElementById('loginScreen');
+    const dashboardWrapper = document.getElementById('dashboardWrapper');
+    const loginForm = document.getElementById('loginForm');
+    const loginMessage = document.getElementById('loginMessage');
+    const welcomeMessage = document.getElementById('welcomeMessage');
+    const globalSearchInput = document.getElementById('globalSearch'); 
+
+    // --- Filter State Variables ---
+    let currentWithdrawalFilter = 'pending'; 
+    let currentDepositFilter = 'all';       
+    let currentActiveTab = 'user-management'; 
+
+    // --- Master Data Storage (UNFILTERED Data from Firestore) ---
+    let allUsers = []; 
+    let allWithdrawals = []; 
+    let allDeposits = []; 
+    let allGiftCodes = []; 
+    let allPaymentDetails = []; 
+    
+    // --- HASHING FUNCTION ---
+    function hashPassword(password) {
+        if (typeof CryptoJS !== 'undefined' && CryptoJS.SHA256) {
+            return CryptoJS.SHA256(password).toString();
+        }
+        console.error("CryptoJS (SHA-256) library not loaded. Returning password as is.");
+        return password; 
+    }
+    
+    function showDashboard(userEmail) {
+        loginScreen.style.display = 'none';
+        dashboardWrapper.classList.add('visible');
+        dashboardWrapper.style.display = 'flex'; 
+        document.body.style.display = 'flex';
+        welcomeMessage.textContent = `Welcome, Manager (${userEmail})!`;
+        
+        setTimeout(() => {
+            loadAllData();
+        }, 50); 
+        
+        const withdrawalFilterElement = document.getElementById('withdrawalFilter');
+        if (withdrawalFilterElement) withdrawalFilterElement.value = currentWithdrawalFilter;
+        const depositFilterElement = document.getElementById('depositFilter');
+        if (depositFilterElement) depositFilterElement.value = 'all'; 
+    }
+
+    function showLoginScreen() {
+        dashboardWrapper.classList.remove('visible');
+        dashboardWrapper.style.display = 'none';
+        loginScreen.style.display = 'flex';
+        document.body.style.display = 'block'; 
+    }
+
+    // Check auth state on load
+    auth.onAuthStateChanged((user) => {
+        if (user) {
+            if (ADMIN_UIDS.includes(user.uid)) {
+                showDashboard(user.email);
+            } else {
+                console.error("Access Denied: User is not an authorized Manager.");
+                alert("Access Denied: Your account is not authorized as a Manager.");
+                auth.signOut();
+                showLoginScreen();
+            }
+        } else {
+            showLoginScreen();
+        }
+    });
+
+    loginForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const email = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        
+        loginMessage.textContent = 'Logging in...';
+        loginMessage.style.color = '#ffc700';
+
+        auth.signInWithEmailAndPassword(email, password)
+            .then(() => {
+                loginMessage.textContent = 'Verifying Manager credentials...';
+                loginMessage.style.color = '#ffc700';
+            })
+            .catch((error) => {
+                console.error("Login Error:", error);
+                loginMessage.textContent = `Login Failed: ${error.message}`;
+                loginMessage.style.color = 'red';
+            });
+    });
+
+    window.logoutAdmin = function() {
+        auth.signOut().then(() => {
+            loginMessage.textContent = 'Logged out successfully.';
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+        }).catch((error) => {
+            console.error("Sign out error:", error);
+        });
+    }
+
+    // --- FIREBASE DATA MANAGEMENT (Loaders) ---
+
+    // Removed initializeCollections for brevity, assuming your collections are set up.
+    async function initializeCollections() { /* ... */ } 
+    
+    // --- LOADER: Payment Details ---
+    async function loadPaymentDetails() {
+        db.collection('user_payment_details').onSnapshot(snapshot => {
+            allPaymentDetails = []; 
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                allPaymentDetails.push({ id: doc.id, ...data }); 
+            });
+            filterAndRenderPaymentDetailsTable(); 
+        }, error => {
+            console.error("Error fetching payment details (Check Rules!):", error);
+            document.getElementById('paymentDetailsTableBody').innerHTML = '<tr><td colspan="6" style="text-align: center; color: red;">Failed to load payment details. Check console and Firebase Rules.</td></tr>';
+        });
+    }
+
+    async function loadWithdrawals() {
+        let query = db.collection('withdrawal_requests'); 
+
+        query.onSnapshot(snapshot => {
+            allWithdrawals = []; 
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                allWithdrawals.push({ id: doc.id, ...data });
+            });
+
+            // Sort by oldest first (assuming this is the pending queue order)
+            allWithdrawals.sort((a, b) => {
+                const timeA = a.timestamp && typeof a.timestamp.toDate === 'function' ? a.timestamp.toDate().getTime() : 0;
+                const timeB = b.timestamp && typeof b.timestamp.toDate === 'function' ? b.timestamp.toDate().getTime() : 0;
+                return timeA - timeB; 
+            });
+
+            filterAndRenderWithdrawalTable(); 
+        }, error => {
+            console.error("Error fetching withdrawals (Check Rules!):", error);
+            document.getElementById('withdrawalTableBody').innerHTML = '<tr><td colspan="7" style="text-align: center; color: red;">Failed to load requests. Check console and Firebase Rules.</td></tr>';
+        });
+    }
+
+    async function loadDeposits() {
+        let query = db.collection('deposit_requests').orderBy('timestamp', 'desc');
+        
+        query.onSnapshot(snapshot => {
+            allDeposits = []; 
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                allDeposits.push({ id: doc.id, ...data });
+            });
+            filterAndRenderDepositTable(); 
+        }, error => {
+            console.error("Error fetching deposits:", error);
+            document.getElementById('depositTableBody').innerHTML = '<tr><td colspan="8" style="text-align: center; color: red;">Failed to load history. Check console and Firebase Rules.</td></tr>';
+        });
+    }
+
+    async function loadGiftCodes() {
+        db.collection('gift_codes').orderBy('creationTime', 'desc').onSnapshot(snapshot => {
+            allGiftCodes = []; 
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                allGiftCodes.push({ id: doc.id, ...data }); 
+            });
+            renderGiftCodeTable(allGiftCodes); 
+        }, error => {
+            console.error("Error fetching gift codes:", error);
+            document.getElementById('giftCodeTableBody').innerHTML = '<tr><td colspan="6" style="text-align: center;">Failed to load codes.</td></tr>';
+        });
+    }
+
+    async function loadAllData() {
+        await initializeCollections(); 
+        
+        // User data listener
+        db.collection('users').onSnapshot(snapshot => {
+            allUsers = []; 
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                allUsers.push({ id: doc.id, ...data }); 
+            });
+
+            // Re-render all tables that depend on user data
+            filterAndRenderUserTable(); 
+            filterAndRenderWithdrawalTable();
+            filterAndRenderDepositTable();
+            filterAndRenderPaymentDetailsTable(); 
+        }, error => {
+            console.error("Error fetching users. Check Firestore Rules!:", error);
+            document.getElementById('userTableBody').innerHTML = '<tr><td colspan="6" style="text-align: center; color: red;">Failed to load users. Check console and Firebase Rules.</td></tr>';
+        });
+
+        loadWithdrawals();
+        loadDeposits();
+        loadGiftCodes();
+        loadPaymentDetails(); 
+    }
+    
+    // --- HELPER FUNCTION: Get Numerical UID from Auth UID ---
+    function getNumericalUID(authUID) {
+        const user = allUsers.find(u => u.id === authUID);
+        return user ? user.numericalUID : 'N/A';
+    }
+    function getUsername(authUID) {
+        const user = allUsers.find(u => u.id === authUID);
+        return user ? user.username : 'N/A';
+    }
+
+
+    // --- FILTER FUNCTIONS ---
+    
+    function filterAndRenderUserTable() {
+        const searchTerm = globalSearchInput.value.toLowerCase().trim();
+        
+        let filteredUsers = allUsers.filter(user => {
+            if (!searchTerm) return true; 
+            
+            return (user.numericalUID && String(user.numericalUID).toLowerCase().includes(searchTerm)) ||
+                   (user.username && user.username.toLowerCase().includes(searchTerm)) ||
+                   (user.phone && user.phone.includes(searchTerm)) ||
+                   (user.id && user.id.toLowerCase().includes(searchTerm)); 
+        });
+
+        renderUserTable(filteredUsers);
+    }
+    
+    function filterAndRenderPaymentDetailsTable() {
+        const searchTerm = globalSearchInput.value.toLowerCase().trim();
+        
+        let filteredDetails = allPaymentDetails.filter(detail => {
+            if (!searchTerm) return true; 
+
+            const authUID = detail.id;
+            const numericalUID = getNumericalUID(authUID);
+            const username = getUsername(authUID);
+            
+            const upiId = detail.upi ? detail.upi.upi_id || '' : '';
+            const accountNumber = detail.bankcard ? detail.bankcard.account_number || '' : '';
+            
+            return (authUID.toLowerCase().includes(searchTerm)) ||
+                   (String(numericalUID).toLowerCase().includes(searchTerm)) ||
+                   (username.toLowerCase().includes(searchTerm)) ||
+                   (upiId.toLowerCase().includes(searchTerm)) ||
+                   (accountNumber.toLowerCase().includes(searchTerm));
+        });
+
+        renderPaymentDetailsTable(filteredDetails);
+    }
+
+    function filterAndRenderWithdrawalTable() {
+        const searchTerm = globalSearchInput.value.toLowerCase().trim();
+        
+        let filteredRequests = allWithdrawals.filter(req => {
+            const statusMatch = currentWithdrawalFilter === 'all' || 
+                                (currentWithdrawalFilter === 'pending' && (req.status === 'pending' || req.status === 'processing')) ||
+                                (req.status === currentWithdrawalFilter);
+            
+            if (!statusMatch) return false;
+            if (!searchTerm) return true; 
+            
+            const numericalUser = allUsers.find(u => u.id === req.uid);
+            const numericalUID = numericalUser ? String(numericalUser.numericalUID) : ''; 
+            
+            return (req.order_number && req.order_number.toLowerCase().includes(searchTerm)) ||
+                   (req.uid && String(req.uid).toLowerCase().includes(searchTerm)) ||
+                   (numericalUID && numericalUID.toLowerCase().includes(searchTerm)) || 
+                   (req.payment_details && req.payment_details.account_number && req.payment_details.account_number.toLowerCase().includes(searchTerm));
+        });
+
+        renderWithdrawalTable(filteredRequests);
+    }
+
+    function filterAndRenderDepositTable() {
+        const searchTerm = globalSearchInput.value.toLowerCase().trim();
+        
+        let filteredDeposits = allDeposits.filter(dep => {
+            const filterStatus = currentDepositFilter === 'all' ? 'all' : currentDepositFilter.charAt(0).toUpperCase() + currentDepositFilter.slice(1);
+            const statusMatch = currentDepositFilter === 'all' || dep.status === filterStatus;
+            
+            if (!statusMatch) return false;
+            if (!searchTerm) return true; 
+            
+            return (dep.order_number && dep.order_number.toLowerCase().includes(searchTerm)) ||
+                   (dep.uid && String(dep.uid).toLowerCase().includes(searchTerm)) ||
+                   (dep.utrReference && dep.utrReference.toLowerCase().includes(searchTerm));
+        });
+
+        renderDepositTable(filteredDeposits);
+    }
+
+
+    // --- RENDER FUNCTIONS ---
+
+    function renderUserTable(users) {
+        const tbody = document.getElementById('userTableBody');
+        tbody.innerHTML = '';
+        users.forEach(user => {
+            const fullUser = allUsers.find(u => u.id === user.id) || user; 
+            
+            const displayUID = fullUser.numericalUID || fullUser.id.substring(0, 8) + '...'; 
+            const statusClass = fullUser.status === 'active' ? 'status-active' : 'status-banned';
+            const actionBtn = fullUser.status === 'active' ? 
+                `<button class="action-btn btn-ban" onclick="processUserAction('${fullUser.id}', 'ban')"><i class="fa fa-ban"></i> Ban</button>` :
+                `<button class="action-btn btn-unban" onclick="processUserAction('${fullUser.id}', 'unban')"><i class="fa fa-check"></i> Unban</button>`;
+            
+            const row = `
+                <tr>
+                    <td>${displayUID}</td>
+                    <td>${fullUser.username || 'N/A'}</td>
+                    <td>${fullUser.phone || 'N/A'}</td> <td><span class="status-badge ${statusClass}">${(fullUser.status || 'N/A').charAt(0).toUpperCase() + (fullUser.status || 'N/A').slice(1)}</span></td>
+                    <td>${(fullUser.balance || 0).toFixed(2)}</td>
+                    <td>
+                        <button class="action-btn btn-edit-balance" onclick="editUserBalance('${fullUser.id}')"><i class="fa fa-pencil"></i> Edit Balance</button>
+                        <button class="action-btn btn-password" onclick="manageUserPassword('${fullUser.id}')"><i class="fa fa-key"></i> Password</button>
+                        ${actionBtn}
+                    </td>
+                </tr>
+            `;
+            tbody.innerHTML += row;
+        });
+        if (users.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No users found.</td></tr>';
+        }
+    }
+    
+    function renderPaymentDetailsTable(details) {
+        const tbody = document.getElementById('paymentDetailsTableBody');
+        tbody.innerHTML = '';
+        
+        if (details.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No saved payment details found.</td></tr>';
+            return;
+        }
+
+        details.forEach(detail => {
+            const authUID = detail.id;
+            const numericalUID = getNumericalUID(authUID);
+            const username = getUsername(authUID);
+            
+            let bankDetailsHTML = '<span class="status-badge status-rejected">NO BANK</span>';
+            let upiDetailsHTML = '<span class="status-badge status-rejected">NO UPI</span>';
+            let lastUpdate = 'N/A';
+            
+            if (detail.bankcard && detail.bankcard.account_number) {
+                const bank = detail.bankcard;
+                const savedTime = bank.saved_at && typeof bank.saved_at.toDate === 'function' ? bank.saved_at.toDate().getTime() : 0;
+                
+                bankDetailsHTML = `
+                    <span class="status-badge status-active">BANK</span>
+                    <i class="fa fa-university" style="color:#ddd;"></i> A/C: ${bank.account_number.slice(-4)} (${bank.bank_name || 'N/A'})
+                `;
+                
+                if (savedTime > (lastUpdate === 'N/A' ? 0 : lastUpdate.getTime())) {
+                    lastUpdate = bank.saved_at.toDate();
+                }
+            }
+
+            if (detail.upi && detail.upi.upi_id) {
+                const upi = detail.upi;
+                const savedTime = upi.saved_at && typeof upi.saved_at.toDate === 'function' ? upi.saved_at.toDate().getTime() : 0;
+                
+                upiDetailsHTML = `
+                    <span class="status-badge status-pending">UPI</span>
+                    <i class="fa fa-credit-card" style="color:#ddd;"></i> ID: ${upi.upi_id}
+                `;
+                
+                if (savedTime > (lastUpdate === 'N/A' ? 0 : lastUpdate.getTime())) {
+                    lastUpdate = upi.saved_at.toDate();
+                }
+            }
+            
+            const lastUpdateDisplay = lastUpdate === 'N/A' ? 'N/A' : lastUpdate.toLocaleString();
+
+            const row = `
+                <tr>
+                    <td>${numericalUID}</td> 
+                    <td>${username}</td>
+                    <td>${bankDetailsHTML}</td>
+                    <td>${upiDetailsHTML}</td>
+                    <td>${lastUpdateDisplay}</td>
+                    <td>
+                        <button class="action-btn btn-edit-details" onclick="editPaymentDetails('${authUID}')">
+                            <i class="fa fa-pencil"></i> Edit Details </button>
+                    </td>
+                </tr>
+            `;
+            tbody.innerHTML += row;
+        });
+    }
+
+    function renderWithdrawalTable(requests) {
+        const tbody = document.getElementById('withdrawalTableBody');
+        tbody.innerHTML = '';
+        requests.forEach(req => {
+            
+            const requestStatus = req.status || 'pending'; 
+            
+            const statusClass = requestStatus === 'completed' ? 'status-approved' : 
+                                requestStatus === 'rejected' ? 'status-rejected' : 
+                                'status-pending'; 
+
+            let statusDisplay = requestStatus.charAt(0).toUpperCase() + requestStatus.slice(1);
+            if (requestStatus === 'rejected' && req.rejectionReason) {
+                statusDisplay += ` <i class="fa fa-info-circle" title="Reason: ${req.rejectionReason}"></i>`; 
+            }
+            
+            const actionButtons = (requestStatus === 'processing' || requestStatus === 'pending') ? 
+                `
+                    <button class="action-btn btn-approve" onclick="processWithdrawal('${req.id}', 'completed')">Complete</button>
+                    <button class="action-btn btn-reject" onclick="processWithdrawal('${req.id}', 'rejected')">Reject</button>
+                ` :
+                `<span class="status-badge ${statusClass}">${statusDisplay}</span>`;
+
+            let rawAmount = req.Amount || req.amount;
+            if (typeof rawAmount === 'string') {
+                rawAmount = parseFloat(rawAmount);
+            }
+            const displayAmount = (rawAmount && !isNaN(rawAmount)) ? rawAmount.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '0.00'; 
+            
+            const paymentDetails = req.payment_details;
+            
+            let rawMethod = req.method; 
+
+            if (!rawMethod && paymentDetails && paymentDetails.method) {
+                rawMethod = paymentDetails.method;
+            }
+
+            let methodDisplay = 'N/A';
+            let viewDetailsBtn = '';
+            
+            if (rawMethod) { 
+                const method = rawMethod.toUpperCase(); 
+                methodDisplay = method === 'BANK' ? 'Bank Card' : method;
+                
+                viewDetailsBtn = `<i class="fa fa-eye details-icon" title="View Payment Profile" onclick="viewPaymentDetails('${req.uid}')"></i>`;
+            }
+
+            const displayUID = getNumericalUID(req.uid); 
+            const displayTime = req.timestamp && typeof req.timestamp.toDate === 'function' ? req.timestamp.toDate().toLocaleString() : 'N/A'; 
+            const orderNumber = req.order_number || req.id;
+            
+            const row = `
+                <tr>
+                    <td><input type="checkbox" value="${req.id}"></td> 
+                    <td>${orderNumber}</td>
+                    <td>${displayUID}</td> 
+                    <td>₹${displayAmount}</td> 
+                    <td class="details-cell method-display">
+                        ${methodDisplay}
+                        ${viewDetailsBtn}
+                    </td>
+                    <td>${displayTime}</td>
+                    <td>
+                        ${actionButtons}
+                    </td>
+                </tr>
+            `;
+            tbody.innerHTML += row;
+        });
+        if (requests.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">No withdrawal requests found for the selected filter or search term.</td></tr>';
+        }
+        const header = document.querySelector('#withdrawal-requests h3');
+        const headerStatus = currentWithdrawalFilter === 'pending' ? 'Pending/Processing' : currentWithdrawalFilter.charAt(0).toUpperCase() + currentWithdrawalFilter.slice(1);
+        header.textContent = `💸 Withdrawal Requests (${headerStatus})`;
+    }
+
+
+    function renderDepositTable(deposits) {
+        const tbody = document.getElementById('depositTableBody');
+        tbody.innerHTML = '';
+        
+        if (deposits.length === 0) {
+             tbody.innerHTML = '<tr><td colspan="8" style="text-align: center;">No deposit history found for the selected filter or search term.</td></tr>';
+             return;
+        }
+
+        deposits.forEach(dep => {
+            const statusLower = dep.status ? dep.status.toLowerCase() : 'pending';
+            const statusClass = statusLower === 'approved' ? 'status-approved' : 
+                                statusLower === 'pending' ? 'status-pending' : 
+                                statusLower === 'rejected' ? 'status-rejected' : 'status-pending'; 
+            
+            const numericalUID = getNumericalUID(dep.uid); 
+            
+            const displayTxnId = dep.order_number || dep.id;
+            const displayUTR = dep.utrReference || 'N/A';
+            const displayMethod = dep.channelName || dep.channel || 'N/A'; 
+            const displayAmount = (dep.amount || 0).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2}); 
+            const displayTime = dep.timestamp && typeof dep.timestamp.toDate === 'function' ? dep.timestamp.toDate().toLocaleString() : 'N/A';
+
+            // --- ACTION BUTTONS ---
+            const actionButtons = (dep.status === 'Pending') ? 
+                `
+                    <button class="action-btn btn-approve" onclick="processDeposit('${dep.id}', 'Approved')">Approve</button>
+                    <button class="action-btn btn-reject" onclick="processDeposit('${dep.id}', 'Rejected')">Reject</button>
+                ` :
+                `<span class="status-badge ${statusClass}">${dep.status || 'N/A'}</span>`;
+            // ---------------------------
+            
+            const row = `
+                <tr>
+                    <td><input type="checkbox" value="${displayTxnId}"></td> 
+                    <td>${displayTxnId}</td>
+                    <td>${numericalUID}</td>
+                    <td>₹${displayAmount}</td>
+                    <td>${displayUTR}</td>
+                    <td>${displayMethod}</td>
+                    <td>${displayTime}</td>
+                    <td>${actionButtons}</td>
+                </tr>
+            `;
+            tbody.innerHTML += row;
+        });
+
+        const header = document.querySelector('#deposit-history h3');
+        const headerStatus = currentDepositFilter === 'all' ? 'All' : currentDepositFilter;
+        header.textContent = `💳 Deposit History (${headerStatus})`;
+    }
+    
+    // --- RENDER FUNCTION: Gift Code History ---
+    function renderGiftCodeTable(codes) {
+        const tbody = document.getElementById('giftCodeTableBody');
+        tbody.innerHTML = '';
+        
+        if (!codes || codes.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No gift codes found.</td></tr>';
+            return;
+        }
+
+        codes.forEach(code => {
+            const statusText = code.currentUses >= code.maxUses ? 'Exhausted' : 'Active';
+            const statusClass = statusText === 'Exhausted' ? 'status-rejected' : 'status-approved';
+            
+            const creationTimeDisplay = code.creationTime ? new Date(code.creationTime).toLocaleString() : 'N/A';
+
+            const row = `
+                <tr>
+                    <td>${code.code || code.id}</td>
+                    <td>${(code.amount || 0).toFixed(2)}</td>
+                    <td>${code.maxUses || 0}</td>
+                    <td>${code.currentUses || 0}</td>
+                    <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                    <td>${creationTimeDisplay}</td>
+                </tr>
+            `;
+            tbody.innerHTML += row;
+        });
+    }
+
+
+    // --- MODAL CONTROL FUNCTIONS ---
+    const detailsModal = document.getElementById('detailsModal');
+    const modalDetailsContent = document.getElementById('modalDetailsContent');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalCloseButton = detailsModal.querySelector('.login-btn');
+
+    window.closeModal = function() {
+        detailsModal.style.display = "none";
+        modalDetailsContent.innerHTML = '';
+        modalCloseButton.style.display = 'block'; 
+    }
+
+    window.onclick = function(event) {
+        if (event.target === detailsModal) {
+            closeModal();
+        }
+    }
+
+    // --- HELPER FUNCTION TO FETCH PAYMENT DETAILS FROM SEPARATE COLLECTION ---
+    async function fetchUserPaymentDetails(authUID) {
+        try {
+            const docRef = db.collection('user_payment_details').doc(authUID);
+            const doc = await docRef.get();
+            if (doc.exists) {
+                return doc.data(); 
+            }
+            return null; 
+        } catch (error) {
+            console.error("Error fetching user_payment_details:", error);
+            return null; 
+        }
+    }
+
+    // --- FUNCTION: Edit User Balance (NEW FEATURE) ---
+    window.editUserBalance = async function(authUID) {
+        const userDoc = allUsers.find(u => u.id === authUID);
+        if (!userDoc) {
+             alert('User data not found in local cache.');
+             return;
+        }
+        
+        const currentBalance = userDoc.balance || 0;
+        const numericalUID = userDoc.numericalUID || authUID.substring(0, 8);
+        const username = userDoc.username || 'User';
+
+        modalTitle.textContent = `Edit Balance for ${username} (UID: ${numericalUID})`;
+        
+        modalDetailsContent.innerHTML = `
+            <form id="editBalanceForm" onsubmit="event.preventDefault(); saveEditedBalance('${authUID}', ${currentBalance})">
+                <div class="editing-form-group">
+                    <label>Current Balance (₹)</label>
+                    <input type="text" value="${currentBalance.toFixed(2)}" disabled style="color: #ffc700; font-size: 1.2em; font-weight: bold;">
+                </div>
+                
+                <h4 class="form-section-title">Manual Balance Adjustment</h4>
+                
+                <div class="editing-form-group">
+                    <label for="adjustmentAmount">Adjustment Amount (₹) (Use '+' for Add, '-' for Deduct)</label>
+                    <input type="number" id="adjustmentAmount" step="0.01" required placeholder="Ex: 500 (Add) or -100 (Deduct)">
+                </div>
+                
+                <div class="editing-form-group">
+                    <label for="adjustmentReason">Reason for Adjustment</label>
+                    <input type="text" id="adjustmentReason" required placeholder="Ex: Correction, Penalty, Manual Award">
+                </div>
+                
+                <button type="submit" class="login-btn" style="background-color: #ffc700; color: #333; margin-top: 20px;">
+                    <i class="fa fa-refresh"></i> Apply Adjustment
+                </button>
+                <div id="balanceEditMessage" style="color: #ffc700; margin-top: 10px; font-weight: bold;"></div>
+            </form>
+        `;
+
+        detailsModal.style.display = "block";
+    }
+
+    window.saveEditedBalance = async function(authUID, currentBalance) {
+        const messageElement = document.getElementById('balanceEditMessage');
+        const amountElement = document.getElementById('adjustmentAmount');
+        const reason = document.getElementById('adjustmentReason').value.trim();
+        const adjustment = parseFloat(amountElement.value);
+
+        messageElement.textContent = 'Processing adjustment...';
+        messageElement.style.color = '#ffc700';
+
+        if (isNaN(adjustment) || adjustment === 0) {
+            messageElement.textContent = 'Error: Please enter a non-zero adjustment amount.';
+            messageElement.style.color = 'red';
+            return;
+        }
+        if (!reason) {
+            messageElement.textContent = 'Error: Adjustment reason is required.';
+            messageElement.style.color = 'red';
+            return;
+        }
+
+        const newBalance = currentBalance + adjustment;
+
+        if (!confirm(`CONFIRM: Adjust balance for User ${getNumericalUID(authUID)}?\n\nCurrent: ₹${currentBalance.toFixed(2)}\nAdjustment: ₹${adjustment.toFixed(2)}\nNew Balance: ₹${newBalance.toFixed(2)}`)) {
+            messageElement.textContent = 'Adjustment Cancelled.';
+            messageElement.style.color = 'red';
+            return;
+        }
+
+        try {
+            await db.runTransaction(async (transaction) => {
+                const userRef = db.collection('users').doc(authUID);
+                const userDoc = await transaction.get(userRef);
+                
+                if (!userDoc.exists) throw new Error("User document not found.");
+
+                // Check against the current balance in Firestore to ensure consistency
+                const firestoreBalance = userDoc.data().balance || 0;
+                
+                // We use the newBalance calculated from the local currentBalance for the update
+                // This transaction ensures the update is atomic.
+                transaction.update(userRef, { balance: newBalance });
+                
+                // Optional: Log the adjustment in a separate collection for audit
+                transaction.set(db.collection('balance_adjustments').doc(), {
+                    uid: authUID,
+                    numericalUID: userDoc.data().numericalUID || 'N/A',
+                    adjustment: adjustment,
+                    oldBalance: firestoreBalance,
+                    newBalance: newBalance,
+                    reason: reason,
+                    manager: auth.currentUser.email,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            });
+
+            messageElement.textContent = `SUCCESS: Balance updated. New balance: ₹${newBalance.toFixed(2)}.`;
+            messageElement.style.color = '#2ecc71';
+            
+            setTimeout(() => {
+                closeModal();
+            }, 1500);
+
+        } catch (error) {
+            console.error("Balance Adjustment Transaction failed:", error);
+            messageElement.textContent = `Failed to adjust balance: ${error.message}`;
+            messageElement.style.color = 'red';
+        }
+    }
+
+
+    // --- FUNCTION: View Payment Details (View Only) ---
+    window.viewPaymentDetails = async function(authUID) { 
+        
+        const numericalUID = getNumericalUID(authUID);
+        const username = getUsername(authUID);
+
+        modalTitle.textContent = `Payment Details for ${username} (UID: ${numericalUID})`;
+        
+        modalDetailsContent.innerHTML = ''; 
+        
+        const details = await fetchUserPaymentDetails(authUID) || {};
+        const bank = details.bankcard || {};
+        const upi = details.upi || {};
+        
+        let detailsHTML = '';
+
+        if (!bank.account_number && !upi.upi_id) {
+             detailsHTML = `<p class="no-details-found" style="color: #FF6347; text-align: center;">🛑 No saved Bank Card or UPI details found for this user.</p>`;
+        } else {
+             detailsHTML += `
+                <h4 class="form-section-title">🏦 Bank Card Details</h4>
+                <div class="details-section">
+                    ${bank.account_number ? `<p class="view-only-detail-item"><span class="view-only-detail-label">Account Holder:</span> <span class="view-only-detail-value">${bank.account_holder || 'N/A'}</span></p>` : ''}
+                    ${bank.account_number ? `<p class="view-only-detail-item"><span class="view-only-detail-label">Account Number:</span> <span class="view-only-detail-value">${bank.account_number}</span></p>` : ''}
+                    ${bank.ifsc ? `<p class="view-only-detail-item"><span class="view-only-detail-label">IFSC Code:</span> <span class="view-only-detail-value">${bank.ifsc}</span></p>` : ''}
+                    ${bank.bank_name ? `<p class="view-only-detail-item"><span class="view-only-detail-label">Bank Name:</span> <span class="view-only-detail-value">${bank.bank_name}</span></p>` : ''}
+                    ${bank.saved_at && typeof bank.saved_at.toDate === 'function' ? `<p class="view-only-detail-item"><span class="view-only-detail-label">Saved At:</span> <span class="view-only-detail-value">${bank.saved_at.toDate().toLocaleString()}</span></p>` : ''}
+                    
+                    ${!bank.account_number && !bank.ifsc ? `<p class="view-only-detail-item" style="color:#e74c3c; font-weight:bold;">No Bank Details Saved</p>` : ''}
+                </div>
+             `;
+
+             detailsHTML += `
+                <h4 class="form-section-title" style="margin-top: 30px;">🆔 UPI Details</h4>
+                <div class="details-section">
+                    ${upi.upi_id ? `<p class="view-only-detail-item"><span class="view-only-detail-label">Account Holder (UPI):</span> <span class="view-only-detail-value">${upi.account_holder || 'N/A'}</span></p>` : ''}
+                    ${upi.upi_id ? `<p class="view-only-detail-item"><span class="view-only-detail-label">UPI ID:</span> <span class="view-only-detail-value">${upi.upi_id}</span></p>` : ''}
+                    ${upi.saved_at && typeof upi.saved_at.toDate === 'function' ? `<p class="view-only-detail-item"><span class="view-only-detail-label">Saved At:</span> <span class="view-only-detail-value">${upi.saved_at.toDate().toLocaleString()}</span></p>` : ''}
+                    
+                    ${!upi.upi_id ? `<p class="view-only-detail-item" style="color:#e74c3c; font-weight:bold;">No UPI Details Saved</p>` : ''}
+                </div>
+             `;
+        }
+        
+        modalDetailsContent.innerHTML = detailsHTML;
+        detailsModal.style.display = "block";
+        modalCloseButton.style.display = 'block'; 
+    }
+
+    // --- FUNCTION: Open Editing Pop-up (For Payment Details Mngmt Tab - Edit Only) ---
+    window.editPaymentDetails = async function(authUID) { 
+        
+        const numericalUID = getNumericalUID(authUID);
+        const username = getUsername(authUID);
+
+        modalTitle.textContent = `Edit Payment Details for ${username} (UID: ${numericalUID})`;
+        
+        modalDetailsContent.innerHTML = ''; 
+        
+        const fetchedDetails = await fetchUserPaymentDetails(authUID); 
+        const details = fetchedDetails || {};
+        const bank = details.bankcard || {};
+        const upi = details.upi || {};
+        
+        let detailsHTML = `
+            <form id="editPaymentForm" onsubmit="event.preventDefault(); saveEditedPaymentDetails('${authUID}')" class="editing-form" style="display: block;">
+                <p style="color: #ffc700; margin-bottom: 15px; font-weight: bold; border: 1px dashed #ffc700; padding: 10px;">
+                    Note: To delete any detail, leave all fields in that section (Bank Card or UPI) completely **blank** and click 'Save Changes'.
+                </p>
+                
+                <h4 class="form-section-title">🏦 Bank Card Details</h4>
+                <div class="editing-form-group">
+                    <label for="bank_holder">Account Holder Name</label>
+                    <input type="text" id="bank_holder" value="${bank.account_holder || ''}" placeholder="Enter Account Holder Name">
+                </div>
+                <div class="editing-form-group">
+                    <label for="bank_number">Account Number</label>
+                    <input type="text" id="bank_number" value="${bank.account_number || ''}" placeholder="Enter Account Number">
+                </div>
+                <div class="editing-form-group">
+                    <label for="bank_ifsc">IFSC Code</label>
+                    <input type="text" id="bank_ifsc" value="${bank.ifsc || ''}" placeholder="Enter IFSC Code">
+                </div>
+                <div class="editing-form-group">
+                    <label for="bank_name">Bank Name</label>
+                    <input type="text" id="bank_name" value="${bank.bank_name || ''}" placeholder="Enter Bank Name">
+                </div>
+
+                <h4 class="form-section-title" style="margin-top: 30px;">🆔 UPI Details</h4>
+                <div class="editing-form-group">
+                    <label for="upi_holder">Account Holder Name (UPI)</label>
+                    <input type="text" id="upi_holder" value="${upi.account_holder || ''}" placeholder="Enter UPI Account Holder Name">
+                </div>
+                <div class="editing-form-group">
+                    <label for="upi_id">UPI ID</label>
+                    <input type="text" id="upi_id" value="${upi.upi_id || ''}" placeholder="Enter UPI ID (e.g., user@bank)">
+                </div>
+                
+                <button type="submit" class="login-btn" style="background-color: #2ecc71; margin-top: 20px;">
+                    <i class="fa fa-save"></i> Save Changes
+                </button>
+                <div id="editMessage" style="color: #ffc700; margin-top: 10px; font-weight: bold;"></div>
+            </form>
+        `;
+
+        modalDetailsContent.innerHTML = detailsHTML;
+        detailsModal.style.display = "block";
+        modalCloseButton.style.display = 'block'; 
+        
+    }
+    
+    // --- FUNCTION: Save Edited Payment Details ---
+    window.saveEditedPaymentDetails = async function(authUID) {
+        const form = document.getElementById('editPaymentForm');
+        const messageElement = document.getElementById('editMessage');
+        messageElement.textContent = 'Saving...';
+        messageElement.style.color = '#ffc700';
+
+        // Bank Details
+        const bankHolder = form.querySelector('#bank_holder').value.trim();
+        const bankNumber = form.querySelector('#bank_number').value.trim();
+        const bankIfsc = form.querySelector('#bank_ifsc').value.trim();
+        const bankName = form.querySelector('#bank_name').value.trim();
+
+        // UPI Details
+        const upiHolder = form.querySelector('#upi_holder').value.trim();
+        const upiId = form.querySelector('#upi_id').value.trim();
+
+        const docRef = db.collection('user_payment_details').doc(authUID);
+        const updateData = {};
+        
+        let isBankFilled = bankHolder || bankNumber || bankIfsc || bankName;
+        let isUpiFilled = upiHolder || upiId;
+
+        if (isBankFilled) {
+            
+            if (!bankHolder || !bankNumber || !bankIfsc) {
+                 messageElement.textContent = 'Warning: Bank details are partially filled. Please complete Account Holder, Account Number, and IFSC, or clear them all to delete the Bank detail.';
+                 messageElement.style.color = '#f39c12';
+                 return;
+            }
+
+            updateData.bankcard = {
+                account_holder: bankHolder,
+                account_number: bankNumber,
+                ifsc: bankIfsc,
+                bank_name: bankName,
+                saved_at: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            
+        } else {
+            // Delete bankcard field if all inputs are blank
+            updateData.bankcard = firebase.firestore.FieldValue.delete();
+        }
+
+        if (isUpiFilled) {
+            
+            if (!upiHolder || !upiId) {
+                messageElement.textContent = 'Warning: UPI details are partially filled. Please complete Account Holder and UPI ID, or clear them both to delete the UPI detail.';
+                messageElement.style.color = '#f39c12';
+                return;
+            }
+            
+            updateData.upi = {
+                account_holder: upiHolder,
+                upi_id: upiId,
+                saved_at: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            
+        } else {
+            // Delete upi field if all inputs are blank
+            updateData.upi = firebase.firestore.FieldValue.delete();
+        }
+        
+        let shouldDeleteDoc = updateData.bankcard === firebase.firestore.FieldValue.delete() && updateData.upi === firebase.firestore.FieldValue.delete();
+
+        try {
+            if (shouldDeleteDoc) {
+                // Delete the entire document if both Bank and UPI are marked for deletion
+                await docRef.delete(); 
+            } else {
+                // Use set with merge to update fields
+                await docRef.set(updateData, { merge: true }); 
+            }
+            
+            messageElement.textContent = `SUCCESS: Payment details updated. ${shouldDeleteDoc ? 'Document deleted as both details were blanked.' : ''}`;
+            messageElement.style.color = '#2ecc71';
+            
+            setTimeout(() => {
+                closeModal();
+            }, 1000); 
+
+        } catch (error) {
+            console.error("Error saving edited details:", error);
+            messageElement.textContent = `Failed to save changes: ${error.message}`;
+            messageElement.style.color = 'red';
+        }
+    }
+
+
+    // --- FUNCTION 2: Show and Reset Password (CLEANED) ---
+    window.manageUserPassword = async function(docId) { 
+        
+        const userDoc = allUsers.find(u => u.id === docId);
+        if (!userDoc) {
+            alert(`Error: User document for ID ${docId} not found.`);
+            return;
+        }
+        
+        const username = userDoc.username || 'N/A';
+
+        const newPassword = prompt(`RESET PASSWORD for ${username} (UID: ${userDoc.numericalUID || docId.substring(0, 8) + '...'}):\n\nEnter NEW password:`);
+        
+        if (newPassword && newPassword.trim() !== '') {
+            
+            const plainPassword = newPassword.trim();
+            const hashedPassword = hashPassword(plainPassword); 
+            
+            if (!hashedPassword || hashedPassword === plainPassword) {
+                 alert("Error: Hashing library (CryptoJS) failed to load or is not working correctly. Password reset cancelled for security reasons.");
+                 return;
+            }
+            
+            try {
+                // Only update the 'password_hash' field with the secure hash.
+                await db.collection('users').doc(docId).update({ 
+                    password_hash: hashedPassword,
+                    // Remove the old (and now unnecessary) 'password' field if it exists
+                    password: firebase.firestore.FieldValue.delete() 
+                });
+                alert(`SUCCESS: User password has been reset.\nNew Password (Hashed):\n${hashedPassword.substring(0, 15)}...`);
+            } catch (error) {
+                console.error("Password Reset Error:", error);
+                alert("Failed to reset password in Firestore. Check console.");
+            }
+        } else if (newPassword === null) {
+            // User pressed Cancel on prompt
+        } else {
+            // User submitted empty password
+            alert("Password reset cancelled or input was empty.");
+        }
+    }
+    
+    // --- ACTION FUNCTIONS (Other parts remain the same) ---
+    
+    async function findUserDocId(identifier) {
+        const identifierTrimmed = identifier.trim();
+        const isNumerical = /^\d+$/.test(identifierTrimmed);
+
+        if (isNumerical) {
+            const userSnap = await db.collection('users').where('numericalUID', '==', parseInt(identifierTrimmed)).limit(2).get();
+
+            if (userSnap.empty) {
+                 const directUserDoc = await db.collection('users').doc(identifierTrimmed).get();
+                 if (directUserDoc.exists) {
+                     return identifierTrimmed; 
+                 }
+                 return null;
+            } else if (userSnap.docs.length > 1) {
+                throw new Error(`Multiple users (${userSnap.docs.length}) found with the numerical UID: ${identifierTrimmed}. Please fix the duplicate entry in Firestore.`);
+            } else {
+                return userSnap.docs[0].id;
+            }
+        } 
+        else {
+            const directUserDoc = await db.collection('users').doc(identifierTrimmed).get();
+            if (directUserDoc.exists) {
+                return identifierTrimmed;
+            }
+        }
+        
+        return null; 
+    }
+
+
+    window.toggleAllCheckboxes = function(source, type) {
+        const checkboxes = document.querySelectorAll(`#${type}TableBody input[type="checkbox"]`);
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = source.checked;
+        });
+    }
+
+    window.deleteSelectedRows = async function(type) {
+        const collectionName = type === 'withdrawal' ? 'withdrawal_requests' : 'deposit_requests'; 
+        const checkboxSelector = `#${type}TableBody input[type="checkbox"]:checked`;
+        const checkedCheckboxes = document.querySelectorAll(checkboxSelector);
+        
+        if (checkedCheckboxes.length === 0) {
+            alert(`Please select at least one ${type} entry to delete.`);
+            return;
+        }
+
+        if (!confirm(`Confirm deletion of ${checkedCheckboxes.length} selected ${type} entries? This is permanent.`)) return;
+        
+        try {
+            const batch = db.batch();
+            checkedCheckboxes.forEach(checkbox => {
+                const docId = checkbox.value;
+                const docRef = db.collection(collectionName).doc(docId);
+                batch.delete(docRef);
+            });
+
+            await batch.commit();
+            alert(`${checkedCheckboxes.length} ${type} entries deleted successfully.`);
+        } catch (error) {
+            console.error(`Error deleting selected ${type} entries:`, error);
+            alert(`Failed to delete selected entries. Check console.`);
+        }
+    }
+
+    window.deleteAllRows = async function(type) {
+        if (!confirm(`WARNING: Are you sure you want to delete ALL ${type} history? This is irreversible.`)) return;
+        
+        const collectionName = type === 'withdrawal' ? 'withdrawal_requests' : 'deposit_requests'; 
+        
+        try {
+            const snapshot = await db.collection(collectionName).limit(500).get(); 
+            
+            if(snapshot.empty) {
+                 alert(`No ${type} entries found to delete.`);
+                 return;
+            }
+
+            const batch = db.batch();
+            snapshot.docs.forEach(doc => {
+                batch.delete(doc.ref);
+            });
+            await batch.commit();
+            alert(`Total ${snapshot.size} ${type} entries cleared successfully.`);
+            
+            if(snapshot.size === 500) {
+                 alert("Warning: Only the first 500 entries have been deleted. You may need to run this command again.");
+            }
+            
+        } catch (error) {
+            console.error(`Error clearing all ${type} history:`, error);
+            alert(`Failed to clear history. Check console.`);
+        }
+    }
+
+
+    
+    window.processUserAction = async function(docId, action) { 
+        const newStatus = action === 'ban' ? 'banned' : 'active';
+        if (confirm(`Confirm ${action.toUpperCase()} user (ID: ${docId})?`)) {
+            try {
+                await db.collection('users').doc(docId).update({ status: newStatus });
+                alert(`User status updated to: ${newStatus}`);
+            } catch (error) {
+                console.error("Error updating user status:", error);
+                alert("Failed to update user status.");
+            }
+        }
+    }
+
+    window.processWithdrawal = async function(docId, newStatus) { 
+        
+        const isCompletion = newStatus === 'completed';
+        
+        let reason = '';
+        if (newStatus === 'rejected') {
+            reason = prompt("Please enter the reason for rejecting the withdrawal:");
+            if (!reason || reason.trim() === '') {
+                alert("Rejection reason is mandatory. Cancelled.");
+                return;
+            }
+        }
+        
+        if (!confirm(`Confirm status change to ${newStatus.toUpperCase()} for request ${docId}?`)) return;
+        
+        const withdrawalDoc = await db.collection('withdrawal_requests').doc(docId).get(); 
+        if (!withdrawalDoc.exists) {
+            alert(`Error: Withdrawal request ${docId} not found.`);
+            return;
+        }
+        const reqData = withdrawalDoc.data();
+        const userId = reqData.uid;
+        
+        let amount = reqData.Amount || reqData.amount; 
+        if (typeof amount === 'string') amount = parseFloat(amount);
+        if (isNaN(amount) || amount === 0) {
+            console.warn(`Withdrawal request ${docId} has an invalid or zero amount: ${amount}`);
+        }
+        
+        if (reqData.status === 'completed' || reqData.status === 'rejected') {
+            alert(`Error: Request ${docData} is already ${reqData.status}.`);
+            return;
+        }
+        
+        try {
+            await db.runTransaction(async (transaction) => {
+                
+                const userDocId = userId; 
+                if (!userDocId) throw new Error("User UID is missing in request document.");
+                
+                const userRef = db.collection('users').doc(userDocId);
+                const userDoc = await transaction.get(userRef);
+                
+                if (!userDoc.exists) throw new Error("User document not found for UID: " + userId);
+                
+                const withdrawalRef = db.collection('withdrawal_requests').doc(docId);
+                
+                const updateData = { 
+                    status: newStatus, 
+                    processedTime: firebase.firestore.FieldValue.serverTimestamp()
+                };
+
+                if (newStatus === 'rejected') {
+                    updateData.rejectionReason = reason; 
+                    
+                    // REFUND LOGIC
+                    const currentBalance = userDoc.data().balance || 0;
+                    const newBalance = currentBalance + amount;
+                    
+                    if (amount > 0) { 
+                        transaction.update(userRef, { balance: newBalance });
+                    }
+                }
+
+                transaction.update(withdrawalRef, updateData);
+                
+                if (isCompletion) {
+                    alert(`SUCCESS: Request ${docId} Completed. Balance remains unchanged.`);
+                } else if (newStatus === 'rejected') {
+                    const refundedAmount = amount;
+                    alert(`SUCCESS: Request ${docId} Rejected. ₹${refundedAmount.toFixed(2)} refunded to User ${getNumericalUID(userId)}'s balance.`);
+                }
+            });
+        } catch (error) {
+            console.error("Transaction failed:", error);
+            alert(`Failed to process withdrawal: ${error.message}`);
+        }
+    }
+    
+    // --- DEPOSIT PROCESSING FUNCTION (UPDATED) ---
+    window.processDeposit = async function(docId, newStatus) { 
+        
+        const isApproval = newStatus === 'Approved';
+        
+        if (newStatus === 'Rejected') {
+            if (!confirm(`Confirm REJECT Deposit ${docId}? User balance will NOT be changed.`)) return;
+        } else if (isApproval) {
+            if (!confirm(`Confirm APPROVE Deposit ${docId}? Amount will be ADDED to user balance.`)) return;
+        } else {
+            return; 
+        }
+
+        const depositDoc = await db.collection('deposit_requests').doc(docId).get(); 
+        if (!depositDoc.exists) {
+            alert(`Error: Deposit request ${docId} not found.`);
+            return;
+        }
+        const reqData = depositDoc.data();
+        const userId = reqData.uid;
+        
+        if (reqData.status === 'Approved' || reqData.status === 'Rejected') {
+            alert(`Error: Request is already ${reqData.status}.`);
+            return;
+        }
+
+        let amount = reqData.amount; 
+        if (typeof amount === 'string') amount = parseFloat(amount);
+        if (isNaN(amount) || amount <= 0) {
+            alert(`Error: Deposit request ${docId} has an invalid or zero amount: ${amount}`);
+            return;
+        }
+        
+        try {
+            await db.runTransaction(async (transaction) => {
+                
+                const userRef = db.collection('users').doc(userId);
+                const userDoc = await transaction.get(userRef);
+                
+                if (!userDoc.exists) throw new Error("User document not found for UID: " + userId);
+                
+                const depositRef = db.collection('deposit_requests').doc(docId);
+                
+                const updateData = { 
+                    status: newStatus, 
+                    processedTime: firebase.firestore.FieldValue.serverTimestamp()
+                };
+
+                if (isApproval) {
+                    // APPROVAL LOGIC: ADD AMOUNT TO BALANCE
+                    const currentBalance = userDoc.data().balance || 0;
+                    const newBalance = currentBalance + amount;
+                    
+                    transaction.update(userRef, { balance: newBalance });
+                }
+                // If Rejected, only status is updated. No change to user balance.
+
+                transaction.update(depositRef, updateData);
+                
+                if (isApproval) {
+                    console.log(`SUCCESS: Deposit ${reqData.order_number} Approved. ₹${amount.toFixed(2)} added.`);
+                } else if (newStatus === 'Rejected') {
+                    console.log(`SUCCESS: Deposit ${reqData.order_number} Rejected. User balance UNCHANGED.`);
+                }
+            });
+            
+            // Show alert outside of transaction for non-blocking confirmation
+            if (isApproval) {
+                alert(`SUCCESS: Deposit ${reqData.order_number} Approved. ₹${amount.toFixed(2)} added to user balance.`);
+            } else if (newStatus === 'Rejected') {
+                alert(`SUCCESS: Deposit ${reqData.order_number} Rejected. User balance UNCHANGED.`);
+            }
+            
+        } catch (error) {
+            console.error("Transaction failed:", error);
+            alert(`Failed to process deposit: ${error.message}`);
+        }
+    }
+
+
+    // --- BONUS & GIFT CODE FUNCTIONS ---
+
+    document.getElementById('manualBonusForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const bonusMessage = document.getElementById('manualBonusMessage');
+        const userId = document.getElementById('bonusUid').value.trim();
+        const amount = parseFloat(document.getElementById('bonusAmount').value);
+        const reason = document.getElementById('bonusReason').value.trim();
+        
+        bonusMessage.textContent = 'Processing...';
+        bonusMessage.style.color = '#ffc700';
+
+        if (isNaN(amount) || amount <= 0) {
+            bonusMessage.textContent = 'Error: Please enter a valid bonus amount.';
+            bonusMessage.style.color = 'red';
+            return;
+        }
+
+        try {
+            await db.runTransaction(async (transaction) => {
+                
+                const userDocId = await findUserDocId(userId);
+                if (!userDocId) throw new Error("User document not found for UID: " + userId);
+                
+                const userRef = db.collection('users').doc(userDocId);
+                const userDoc = await transaction.get(userRef);
+                
+                if (!userDoc.exists) throw new Error("User document not found (after initial check)!");
+                
+                const currentBalance = userDoc.data().balance || 0;
+                const newBalance = currentBalance + amount;
+                
+                transaction.update(userRef, { balance: newBalance });
+                
+                const bonusData = {
+                    uidInput: userId, 
+                    firestoreDocId: userDocId, 
+                    numericalUID: userDoc.data().numericalUID || 'N/A',
+                    amount: amount,
+                    reason: reason,
+                    time: firebase.firestore.FieldValue.serverTimestamp(),
+                    manager: auth.currentUser.email
+                };
+                transaction.set(db.collection('bonus_history').doc(), bonusData); 
+            });
+
+            bonusMessage.textContent = `SUCCESS: ₹${amount.toFixed(2)} added to User ${userId}. New balance updated.`;
+            bonusMessage.style.color = '#27ae60';
+            document.getElementById('manualBonusForm').reset();
+
+        } catch (error) {
+            console.error("Manual Bonus Transaction failed:", error);
+            const displayError = error.message.includes("document not found") || error.message.includes("Multiple users found") 
+                                 ? error.message 
+                                 : "Failed due to a system error. Check console.";
+            bonusMessage.textContent = `Failed: ${displayError}`;
+            bonusMessage.style.color = 'red';
+        }
+    });
+
+    function generateGiftCode() {
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let result = '';
+        for (let i = 0; i < 15; i++) {
+            result += characters.charAt(Math.floor(Math.random() * characters.length));
+        }
+        return result;
+    }
+    
+    window.clearGiftCodeHistory = async function() {
+        if (!confirm("WARNING: Are you sure you want to delete ALL gift codes? This action is irreversible.")) return;
+
+        try {
+            const batch = db.batch();
+            const snapshot = await db.collection('gift_codes').limit(500).get(); 
+            
+            if(snapshot.empty) {
+                 alert("No gift codes found to delete.");
+                 return;
+            }
+            
+            snapshot.docs.forEach(doc => {
+                batch.delete(doc.ref);
+            });
+            await batch.commit();
+            alert(`Total ${snapshot.size} gift codes cleared successfully.`);
+
+            if(snapshot.size === 500) {
+                 alert("Warning: Only the first 500 gift codes have been deleted. You may need to run this command again.");
+            }
+        } catch (error) {
+            console.error("Error clearing gift code history:", error);
+            alert("Failed to clear history. Check console.");
+        }
+    }
+
+    document.getElementById('giftCodeForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const codeMessage = document.getElementById('giftCodeMessage');
+        const amount = parseFloat(document.getElementById('giftCodeAmount').value);
+        const maxUses = parseInt(document.getElementById('giftCodeMaxUses').value);
+        
+        let newCode = generateGiftCode();
+
+        codeMessage.textContent = 'Generating and saving code...';
+        codeMessage.style.color = '#ffc700';
+
+        if (isNaN(amount) || amount <= 0 || isNaN(maxUses) || maxUses <= 0) {
+            codeMessage.textContent = 'Error: Please ensure Amount (>0) and Max Users (>0) are valid.';
+            codeMessage.style.color = 'red';
+            return;
+        }
+
+        try {
+            for(let i = 0; i < 3; i++) {
+                const existingCode = await db.collection('gift_codes').doc(newCode).get();
+                if (!existingCode.exists) {
+                    break;
+                }
+                if (i === 2) {
+                    throw new Error(`Code collision detected after 3 attempts. Please try again.`);
+                }
+                newCode = generateGiftCode();
+            }
+
+
+            const giftCodeData = {
+                code: newCode,
+                amount: amount,
+                maxUses: maxUses,
+                currentUses: 0, 
+                isActive: true,
+                creationTime: new Date().toISOString(),
+                manager: auth.currentUser.email
+            };
+
+            await db.collection('gift_codes').doc(newCode).set(giftCodeData);
+
+            codeMessage.textContent = `SUCCESS: Gift Code '${newCode}' created! Amount: ₹${amount.toFixed(2)}, Max Users: ${maxUses}.`;
+            codeMessage.style.color = '#27ae60';
+            document.getElementById('giftCodeForm').reset();
+            
+        } catch (error) {
+            console.error("Gift Code Creation failed:", error);
+            codeMessage.textContent = `Failed: ${error.message}`;
+            codeMessage.style.color = 'red';
+        }
+    });
+
+
+    // --- EVENT LISTENERS ---
+
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            document.querySelectorAll('.nav-link').forEach(nav => nav.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+
+            this.classList.add('active');
+            const tabId = this.getAttribute('data-tab');
+            document.getElementById(tabId).classList.add('active');
+            currentActiveTab = tabId; 
+            
+            handleGlobalSearch(); 
+        });
+    });
+
+    function handleGlobalSearch() {
+        if (currentActiveTab === 'user-management') {
+            filterAndRenderUserTable();
+        } else if (currentActiveTab === 'withdrawal-requests') {
+            if (allUsers.length > 0) {
+               filterAndRenderWithdrawalTable();
+            }
+        } else if (currentActiveTab === 'deposit-history') {
+            filterAndRenderDepositTable();
+        } else if (currentActiveTab === 'payment-details') {
+            filterAndRenderPaymentDetailsTable();
+        }
+    }
+    
+    if (globalSearchInput) {
+        globalSearchInput.addEventListener('keyup', handleGlobalSearch);
+        globalSearchInput.addEventListener('paste', () => setTimeout(handleGlobalSearch, 0));
+    }
+
+
+    const withdrawalFilter = document.getElementById('withdrawalFilter');
+    if (withdrawalFilter) {
+        withdrawalFilter.addEventListener('change', function() {
+            currentWithdrawalFilter = this.value;
+            filterAndRenderWithdrawalTable();
+        });
+    }
+
+    const depositFilter = document.getElementById('depositFilter');
+    if (depositFilter) {
+        depositFilter.addEventListener('change', function() {
+            currentDepositFilter = this.value;
+            filterAndRenderDepositTable();
+        });
+    }
+    
+</script>
+</body>
+</html>

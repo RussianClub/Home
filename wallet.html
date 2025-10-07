@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Russian Club - Wallet</title>
+    
+    <style>
+        /* Global & Reset Styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #1a1a1a; /* Dark background */
+            color: #f0f0f0; /* Light text */
+        }
+        .container {
+            max-width: 450px; 
+            margin: 0 auto;
+            padding: 0;
+            background-color: #1a1a1a;
+        }
+
+        /* Define fixed header/footer height for content padding */
+        :root {
+            --header-height: 55px; 
+            --footer-height: 60px;
+        }
+/* ------------------- GLASSMORPHIC STICKY HEADER ------------------- */
+.sticky-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-width: 335px;
+    margin: 0 auto;
+
+    /* Glassmorphism effect */
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(12px) saturate(180%);
+    -webkit-backdrop-filter: blur(12px) saturate(180%);
+
+    border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2em;  
+    font-weight: 800;   
+    z-index: 1000;
+    border-radius: 0 0 12px 12px;
+    letter-spacing: 1px;
+
+    /* Fixed height remove, padding se content safe */
+    height: auto;
+    padding: 8px 12px; /* Top & bottom padding for no cut */
+}
+        .header-title {
+            flex-grow: 1;
+            text-align: center;
+            font-size: 1em;
+        }
+        .header-icon {
+            color: #f0f0f0;
+            font-size: 1.5em;
+            cursor: pointer;
+        }
+        .header-icon.left {
+            margin-right: 10px;
+        }
+        .header-icon.right {
+            margin-left: 10px;
+            visibility: hidden; /* Placeholder for alignment */
+        }
+
+
+        /* ------------------- MAIN CONTENT AREA ------------------- */
+        .main-content {
+            padding-top: var(--header-height); 
+            padding-bottom: var(--footer-height); 
+            text-align: center;
+        }
+
+        /* ------------------- Top Balance Display ------------------- */
+        .top-balance {
+            padding: 20px 0;
+            background-color: #333;
+            margin-bottom: 20px;
+        }
+        .wallet-icon {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            color: #ffc700;
+        }
+        .wallet-amount {
+            font-size: 2em;
+            font-weight: bold;
+            color: #ffc700;
+            margin-bottom: 5px;
+        }
+        .total-balance-label {
+            font-size: 0.9em;
+            color: #999;
+        }
+
+        /* ------------------- Wallet Circles Section ------------------- */
+        .wallet-circles-section {
+            display: flex;
+            justify-content: space-around;
+            padding: 0 10px 20px;
+            background-color: #333;
+            border-radius: 0 0 8px 8px; 
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        /* CSS for the circular percentage display */
+        .circle-container {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 15px 0;
+        }
+        .circular-progress {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: 
+                radial-gradient(closest-side, #333 79%, transparent 80% 100%),
+                conic-gradient(#ffc700 0%, #444 0%); /* 0% progress */
+            transition: background 0.3s ease;
+        }
+        .circle-amount {
+            font-size: 1em;
+            font-weight: bold;
+            color: #f0f0f0;
+        }
+        .circle-label {
+            font-size: 0.7em;
+            color: #999;
+            margin-top: 5px;
+        }
+        .circle-percent {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.9em;
+            font-weight: bold;
+            color: #ffc700;
+        }
+
+        /* ------------------- Transfer Button ------------------- */
+        .transfer-button-container {
+            padding: 20px 10px;
+        }
+        .transfer-button {
+            display: block;
+            background-color: #ffc700; /* Gold/Yellow accent */
+            color: #1a1a1a;
+            padding: 15px 0;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: bold;
+            text-decoration: none;
+            box-shadow: 0 4px 10px rgba(255, 199, 0, 0.5);
+        }
+
+        /* ------------------- Action Grid ------------------- */
+        .action-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            padding: 20px 10px;
+            margin-bottom: 20px;
+            background-color: #333;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+        .action-item {
+            text-align: center;
+            text-decoration: none;
+            color: #f0f0f0;
+            font-size: 0.75em;
+        }
+        .action-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin: 0 auto 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            color: white;
+        }
+        
+        /* Simulating the colored icons */
+        .icon-deposit { background-color: #ff8c42; } /* Orange */
+        .icon-withdraw { background-color: #42aaff; } /* Blue */
+        .icon-deposit-history { background-color: #ff429c; } /* Pink */
+        .icon-withdraw-history { background-color: #42ff67; } /* Green */
+
+        /* ------------------- FIXED BOTTOM NAVIGATION (Matching Theme) ------------------- */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            max-width: 450px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-around;
+            background-color: #2b2b2b;
+            border-top: 1px solid #444;
+            padding: 5px 0;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            height: var(--footer-height); 
+            box-sizing: border-box;
+        }
+        .nav-item {
+            text-align: center;
+            text-decoration: none;
+            color: #999;
+            font-size: 0.7em;
+            padding: 5px 0;
+        }
+        .nav-item.active {
+            color: #ffc700; 
+        }
+        .nav-item img {
+            width: 24px;
+            height: 24px;
+            display: block;
+            margin: 0 auto 2px;
+            filter: grayscale(100%); 
+        }
+        .nav-item.active img {
+            filter: grayscale(0%); 
+        }
+        .special-nav-button {
+            background-color: #ffc700; 
+            color: #1a1a1a;
+            font-size: 0.9em;
+            font-weight: bold;
+            padding: 8px 15px;
+            border-radius: 20px;
+            margin-top: -10px;
+            box-shadow: 0 4px 10px rgba(255, 199, 0, 0.5);
+            align-self: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <div class="sticky-header">
+            <span class="header-icon left">←</span> <div class="header-title">Wallet</div>
+            <span class="header-icon right"></span>
+        </div>
+        
+        <div class="main-content">
+
+            <div class="top-balance">
+                <div class="wallet-icon">💳</div> 
+                <div class="wallet-amount">₹0.00</div>
+                <div class="total-balance-label">Total balance</div>
+            </div>
+
+            <div class="wallet-circles-section">
+                
+                <div class="circle-container">
+                    <div class="circle-percent">0%</div>
+                    <div class="circular-progress" style="background: 
+                        radial-gradient(closest-side, #333 79%, transparent 80% 100%),
+                        conic-gradient(#ffc700 0%, #444 0%);">
+                        <span class="circle-amount">₹0.00</span>
+                        <span class="circle-label">Main wallet</span>
+                    </div>
+                </div>
+
+                <div class="circle-container">
+                    <div class="circle-percent">0%</div>
+                     <div class="circular-progress" style="background: 
+                        radial-gradient(closest-side, #333 79%, transparent 80% 100%),
+                        conic-gradient(#ffc700 0%, #444 0%);">
+                        <span class="circle-amount">₹0.00</span>
+                        <span class="circle-label">3rd party wallet</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="transfer-button-container">
+                <a href="#" class="transfer-button">Main wallet transfer</a>
+            </div>
+
+            <div class="action-grid">
+                
+                <a href="deposit.html" class="action-item">
+                    <div class="action-icon icon-deposit">D</div>
+                    Deposit
+                </a>
+                <a href="#" class="action-item">
+                    <div class="action-icon icon-withdraw">W</div>
+                    Withdraw
+                </a>
+                <a href="#" class="action-item">
+                    <div class="action-icon icon-deposit-history">H</div>
+                    Deposit history
+                </a>
+                <a href="#" class="action-item">
+                    <div class="action-icon icon-withdraw-history">H</div>
+                    Withdrawal history
+                </a>
+            </div>
+            
+        </div>
+
+<!-- ===== Bottom Nav Glassmorphism ===== -->
+<style>
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 65px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(12px) saturate(180%);
+    -webkit-backdrop-filter: blur(12px) saturate(180%);
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.2);
+    z-index: 999;
+}
+
+.bottom-nav .nav-item {
+    flex: 1;
+    text-align: center;
+    color: #ccc;
+    font-size: 12px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.bottom-nav .nav-item img {
+    width: 25px;
+    height: 25px;
+    margin-bottom: 3px;
+    transition: transform 0.3s ease, filter 0.3s ease;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+}
+
+/* Active Nav Item */
+.bottom-nav .nav-item.active {
+    color: #ffc700;
+    font-weight: bold;
+}
+
+.bottom-nav .nav-item.active img {
+    transform: translateY(-3px) scale(1.1);
+    filter: drop-shadow(0 4px 6px rgba(255,199,0,0.6));
+}
+
+/* Underline Effect */
+.bottom-nav .nav-item span {
+    position: relative;
+}
+
+.bottom-nav .nav-item.active span::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 2px;
+    background: #ffc700;
+    border-radius: 2px;
+    animation: underline 0.3s ease forwards;
+}
+
+@keyframes underline {
+    from { width: 0; opacity: 0; }
+    to { width: 20px; opacity: 1; }
+}
+
+/* Special Button Capsule */
+.special-nav-button {
+    position: relative;
+    background: linear-gradient(135deg, #ffcc00, #ff8800);
+    padding: 12px 18px;
+    border-radius: 40px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #1a1a1a;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    transform: translateY(10%);
+    text-decoration: none;
+    text-align: center;
+    transition: transform 0.2s ease;
+}
+
+.special-nav-button:hover {
+    transform: translateY(5%) scale(1.05);
+}
+
+/* PNG Icon Above Capsule */
+.special-nav-button::before {
+    content: '';
+    position: absolute;
+    top: -66px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 66px;
+    height: 66px;
+    background: url('images/wheelprize.png') no-repeat center center;
+    background-size: contain;
+    pointer-events: none;
+}
+</style>
+
+<!-- ===== Bottom Navigation ===== -->
+<div class="bottom-nav">
+    <a href="home.html" class="nav-item">
+        <img src="https://img.icons8.com/ios-filled/50/ffffff/home.png" alt="Home">
+        <span>Home</span>
+    </a>
+    <a href="activity.html" class="nav-item">
+        <img src="https://img.icons8.com/ios-filled/50/ffffff/activity-history.png" alt="Activity">
+        <span>Activity</span>
+    </a>
+    <!-- ===== Fixed Special Button ===== -->
+    <a href="#" class="special-nav-button">
+        GET ₹300
+    </a>
+    <a href="promotion.html" class="nav-item">
+        <img src="https://img.icons8.com/ios-filled/50/ffffff/discount--v1.png" alt="Promotion">
+        <span>Promotion</span>
+    </a>
+    <a href="account.html" class="nav-item">
+        <img src="https://img.icons8.com/ios-filled/50/ffffff/user.png" alt="My">
+        <span>Account</span>
+    </a>
+</div>
+
+<!-- ===== JS: Active Tab Detect by Page ===== -->
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const navItems = document.querySelectorAll(".bottom-nav .nav-item");
+    const currentPage = window.location.pathname.split("/").pop(); // current file name
+
+    navItems.forEach(item => {
+        const href = item.getAttribute("href");
+        if (href === currentPage) {
+            item.classList.add("active");
+        } else {
+            item.classList.remove("active");
+        }
+    });
+});
+</script>
+
+</body>
+</html>
