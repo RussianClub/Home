@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Russian Club - Login / Sign Up</title>
+    
+    <style>
+        /* ------------------- SPLASH SCREEN STYLES (REDESIGNED) ------------------- */
+        #splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #1a1a1a;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999; 
+            transition: opacity 0.5s ease-out;
+        }
+
+        .splash-image-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .splash-image-container img {
+            max-width: 90%; 
+            height: auto;
+            margin-bottom: 10px;
+        }
+
+        .splash-tagline {
+            color: #f0f0f0;
+            font-size: 1.2em;
+            font-weight: 500;
+            text-align: center;
+            margin-bottom: 50px;
+            padding: 0 15px;
+        }
+
+        /* Russian Club Text (Smaller and at the bottom) */
+        .splash-header-text {
+            line-height: 1.2;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.4);
+            display: inline-flex;
+            align-items: center;
+            font-size: 1.6em;
+            font-weight: 800;
+        }
+
+        .splash-header-text span {
+            padding: 4px 8px;
+            color: white; 
+        }
+        .splash-header-text .russian-color {
+            color: #e50074; 
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 6px 0 0 6px;
+            font-weight: 900;
+        }
+        .splash-header-text .club-color {
+            color: white;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 0 6px 6px 0;
+            font-weight: 700;
+        }
+        
+        /* ------------------- MAIN PAGE STYLES (Existing) ------------------- */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #1a1a1a; 
+            color: #f0f0f0; 
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center; 
+            justify-content: flex-start; 
+            padding-top: 10vh; 
+        }
+
+        .container {
+            max-width: 450px; 
+            width: 95%;
+            margin: 0 auto;
+            padding: 0; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .page-header {
+            width: 100%;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header-text {
+            line-height: 1.2;
+            text-shadow: 0 2px 6px rgba(0,0,0,0.6);
+            display: inline-flex;
+            align-items: center;
+            font-size: 1.8em; 
+            font-weight: 800;
+        }
+        .header-text span {
+            padding: 5px 10px;
+            color: white; 
+        }
+        .header-text .russian-color {
+            color: #e50074; 
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 8px 0 0 8px;
+            font-weight: 900;
+        }
+        .header-text .club-color {
+            color: white;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 0 8px 8px 0;
+            font-weight: 700;
+        }
+
+        .auth-card {
+            width: 90%;
+            padding: 25px 20px;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px) saturate(180%);
+            -webkit-backdrop-filter: blur(10px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            overflow: hidden; 
+            transition: height 0.4s ease-in-out; 
+            box-sizing: border-box; 
+        }
+        
+        .auth-card.login-state {
+            height: 380px; 
+        }
+
+        .auth-card.signup-state {
+            height: 470px; 
+        }
+
+
+        .auth-card h2 {
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 25px;
+            font-size: 1.6em;
+            color: #ffc700;
+            text-shadow: 0 0 8px rgba(255, 199, 0, 0.5);
+            height: 1.2em; 
+            transition: color 0.4s ease;
+        }
+
+        .tab-buttons {
+            display: flex;
+            margin-bottom: 25px;
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+            padding: 5px;
+        }
+
+        .tab-button {
+            flex-grow: 1;
+            padding: 10px 15px;
+            text-align: center;
+            color: #f0f0f0;
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 18px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .tab-button.active {
+            background: linear-gradient(90deg, #ffc700, #ff8800);
+            color: #1a1a1a;
+            box-shadow: 0 4px 10px rgba(255, 199, 0, 0.4);
+        }
+
+        .form-carousel {
+            width: 100%; 
+            overflow: hidden;
+        }
+        
+        .form-carousel-inner {
+            display: flex;
+            width: 200%; 
+            height: 100%;
+            transition: transform 0.4s ease-in-out;
+        }
+
+        .form-carousel.signup-active .form-carousel-inner {
+            transform: translateX(-50%); 
+        }
+        
+        .form-panel {
+            width: 50%;
+            padding: 0 5px; 
+            box-sizing: border-box;
+            flex-shrink: 0;
+        }
+        
+        .form-panel form {
+            width: 100%; 
+        }
+
+        .input-group {
+            margin-bottom: 18px; 
+            position: relative;
+        }
+
+        /* Common icon styling (Phone, Lock) */
+        .input-group > img {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            filter: invert(70%);
+        }
+
+        .auth-input {
+            width: 100%;
+            padding: 12px 12px 12px 50px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            background-color: rgba(0, 0, 0, 0.3);
+            color: #f0f0f0;
+            font-size: 1em;
+            box-sizing: border-box;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .auth-input:focus {
+            border-color: #ffc700;
+            box-shadow: 0 0 8px rgba(255, 199, 0, 0.5);
+            outline: none;
+        }
+
+        .auth-input::placeholder {
+            color: #aaa;
+        }
+
+        /* ------------------- PASSWORD TOGGLE STYLES (NEW) ------------------- */
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            z-index: 10;
+            padding: 5px;
+        }
+        
+        .password-toggle svg {
+            width: 100%;
+            height: 100%;
+            fill: none;
+            stroke: #aaaaaa;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            transition: stroke 0.3s;
+        }
+
+        .password-toggle:hover svg {
+            stroke: #ffc700;
+        }
+        /* ------------------------------------------------------------------- */
+
+
+        .submit-button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(90deg, #e50074, #ff0099);
+            color: white;
+            font-size: 1.1em;
+            font-weight: bold;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s, box-shadow 0.3s;
+            box-shadow: 0 6px 15px rgba(229, 0, 116, 0.4);
+        }
+
+        .submit-button:hover {
+            background: linear-gradient(90deg, #ff0099, #e50074);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(229, 0, 116, 0.6);
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            font-size: 0.85em;
+        }
+
+        .footer-links a {
+            color: #ffc700;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .terms-checkbox {
+            display: flex;
+            align-items: center;
+            margin-top: 5px; 
+            margin-bottom: 20px; 
+            font-size: 0.85em;
+        }
+
+        .terms-checkbox input[type="checkbox"] {
+            margin-right: 8px;
+            width: 18px;
+            height: 18px;
+            accent-color: #ffc700;
+        }
+
+        .terms-checkbox a {
+            color: #ffc700;
+            text-decoration: none;
+        }
+
+        #error-message {
+            color: #ffc700;
+            text-align: center;
+            margin-top: 15px;
+            font-weight: bold;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="splash-screen">
+        <div class="splash-image-container">
+            <img src="assets/png/konglor888-girl01.png" alt="Gaming Graphic">
+            <p class="splash-tagline">Withdraw fast, safe and stable</p>
+        </div>
+        
+        <div class="splash-header-text">
+            <span class="russian-color">RUSSIAN</span><span class="club-color">CLUB</span>
+        </div>
+    </div>
+    <div class="container">
+        
+        <div class="page-header">
+            <div class="header-text">
+                <span class="russian-color">RUSSIAN</span><span class="club-color">CLUB</span>
+            </div>
+        </div>
+        
+        <div class="auth-card" id="authCard">
+            <h2 id="auth-title">Welcome Back!</h2> 
+            <div id="error-message"></div>
+            <div class="tab-buttons">
+                <div class="tab-button active" id="loginTab">LOG IN</div>
+                <div class="tab-button" id="signupTab">SIGN UP</div>
+            </div>
+
+            <div class="form-carousel" id="formCarousel">
+                <div class="form-carousel-inner" id="formCarouselInner">
+                    
+                    <div class="form-panel" id="loginPanel">
+                        <form id="loginForm">
+                            <div class="input-group">
+                                <img src="https://img.icons8.com/ios-filled/20/aaaaaa/phone.png" alt="Phone Icon">
+                                <input type="number" id="login-phone" class="auth-input" placeholder="Enter Phone Number" required>
+                            </div>
+                            
+                            <div class="input-group">
+                                <img src="https://img.icons8.com/ios-filled/20/aaaaaa/lock.png" alt="Password Icon">
+                                <input type="password" id="login-password" class="auth-input" placeholder="Enter Password" required>
+                                
+                                <span class="password-toggle" id="login-toggle">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="#aaaaaa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.94 3.19M1 1l22 22M12 12a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+                                    </svg>
+                                </span>
+                            </div>
+
+                            <button type="submit" class="submit-button" id="loginButton">LOG IN</button>
+                        </form>
+
+                        <div class="footer-links"> 
+                            <a href="forgot_password.html">Forgot Password?</a>
+                            <a href="customer_service.html">Need Help?</a>
+                        </div>
+                    </div>
+
+                    <div class="form-panel" id="signupPanel">
+                        <form id="signupForm">
+                            <div class="input-group">
+                                <img src="https://img.icons8.com/ios-filled/20/aaaaaa/phone.png" alt="Phone Icon">
+                                <input type="number" id="signup-phone" class="auth-input" placeholder="Enter Phone Number" required>
+                            </div>
+                            
+                            <div class="input-group">
+                                <img src="https://img.icons8.com/ios-filled/20/aaaaaa/lock.png" alt="Password Icon">
+                                <input type="password" id="signup-password" class="auth-input" placeholder="Set Password (6-16ch.." required minlength="6" maxlength="16">
+                                
+                                <span class="password-toggle" id="signup-toggle">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="#aaaaaa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.94 3.19M1 1l22 22M12 12a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+                                    </svg>
+                                </span>
+                            </div>
+
+                            <div class="input-group">
+                                <img src="https://img.icons8.com/ios-filled/20/aaaaaa/guest-male.png" alt="Referral Icon">
+                                <input type="text" id="referral" class="auth-input" placeholder="Referral Code (Optional)">
+                            </div>
+                            
+                            <div class="terms-checkbox">
+                                <input type="checkbox" id="agree" required>
+                                <label for="agree">I agree with the <a href="terms.html">Terms and Conditions</a></label>
+                            </div>
+
+                            <button type="submit" class="submit-button" id="signupButton">SIGN UP</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+<script>
+    // 1. Firebase Initialization (V8)
+    var firebaseConfig = {
+        apiKey: "AIzaSyDlEY_2bDv25T5GTCzTEk7sQIZR-axh5irc", // Ensure this is your correct key
+        authDomain: "russian-club.firebaseapp.com",
+        databaseURL: "https://russian-club-default-rtdb.firebaseio.com",
+        projectId: "russian-club",
+        storageBucket: "russian-club.appspot.com",
+        messagingSenderId: "1096848291195",
+        appId: "1:1096848291195:web:2c8c12e9c6c913f83210c7",
+        measurementId: "G-5M46DNJ1YP"
+    };
+
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
+    
+    // Global Firestore instance
+    const db = firebase.firestore();
+    
+    // Helper function to display errors
+    function displayError(message) {
+        const errorElement = document.getElementById('error-message');
+        errorElement.textContent = message;
+        errorElement.style.display = 'block';
+        setTimeout(() => { errorElement.style.display = 'none'; }, 5000);
+    }
+    
+    // Function to generate a simple UID based on timestamp (for custom auth)
+    function generateCustomUID() {
+        return 'C' + Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+    }
+    
+    // 🚨 HASHING FUNCTION 🚨
+    async function hashPassword(password) {
+        if (typeof crypto === 'undefined' || !crypto.subtle) {
+            // Throw a custom error if the Web Crypto API is unavailable
+            throw new Error("SECURE_CONTEXT_REQUIRED: Password hashing failed. The browser's Web Crypto API (crypto.subtle) is not available. Please run the page over HTTPS or localhost.");
+        }
+        
+        // Encode the string as utf-8
+        const msgBuffer = new TextEncoder().encode(password);                    
+        
+        // Hash the message
+        const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+
+        // Convert ArrayBuffer to Array
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+
+        // Convert bytes to hex string (Base64 is also common)
+        const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        return hashHex;
+    }
+
+    // ------------------- PASSWORD TOGGLE LOGIC -------------------
+    function setupPasswordToggle(inputId, toggleId) {
+        const passwordInput = document.getElementById(inputId);
+        const toggleButton = document.getElementById(toggleId);
+
+        if (!passwordInput || !toggleButton) return;
+
+        toggleButton.addEventListener('click', () => {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            
+            // Toggle the SVG icon
+            if (type === 'text') {
+                 toggleButton.innerHTML = `
+                     <svg viewBox="0 0 24 24" fill="none" stroke="#aaaaaa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                         <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                         <circle cx="12" cy="12" r="3"></circle>
+                     </svg>
+                 `;
+            } else {
+                 toggleButton.innerHTML = `
+                     <svg viewBox="0 0 24 24" fill="none" stroke="#aaaaaa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                         <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.94 3.19M1 1l22 22M12 12a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+                     </svg>
+                 `;
+            }
+        });
+    }
+    // -------------------------------------------------------------------
+
+    // 2. DOMContentLoaded
+    document.addEventListener("DOMContentLoaded", function() {
+        const loginTab = document.getElementById('loginTab');
+        const signupTab = document.getElementById('signupTab');
+        const formCarousel = document.getElementById('formCarousel');
+        const authTitle = document.getElementById('auth-title');
+        const authCard = document.getElementById('authCard');
+        const splashScreen = document.getElementById('splash-screen');
+        const loginForm = document.getElementById('loginForm');
+        const signupForm = document.getElementById('signupForm');
+        const loginButton = document.getElementById('loginButton');
+        const signupButton = document.getElementById('signupButton');
+
+        // Setup the password toggles
+        setupPasswordToggle('login-password', 'login-toggle');
+        setupPasswordToggle('signup-password', 'signup-toggle');
+
+
+        // Splash Screen Logic
+        setTimeout(() => {
+            splashScreen.style.opacity = '0';
+            setTimeout(() => {
+                splashScreen.style.display = 'none';
+            }, 500);
+        }, 1500);
+
+        // Tab Switching Logic
+        authCard.classList.add('login-state'); // Initial state
+
+        function switchToLogin() {
+            loginTab.classList.add('active');
+            signupTab.classList.remove('active');
+            formCarousel.classList.remove('signup-active');
+            authTitle.textContent = 'Welcome Back!';
+            authCard.classList.remove('signup-state');
+            authCard.classList.add('login-state');
+            document.getElementById('error-message').style.display = 'none';
+        }
+
+        function switchToSignup() {
+            signupTab.classList.add('active');
+            loginTab.classList.remove('active');
+            formCarousel.classList.add('signup-active');
+            authTitle.textContent = 'Create New Account';
+            authCard.classList.remove('login-state');
+            authCard.classList.add('signup-state');
+            document.getElementById('error-message').style.display = 'none';
+        }
+
+        loginTab.addEventListener('click', switchToLogin);
+        signupTab.addEventListener('click', switchToSignup);
+
+
+        // 3. 🔑 CUSTOM LOGIN FUNCTIONALITY (STATUS CHECK ADDED) 🔑
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            loginButton.textContent = 'Logging in...';
+            loginButton.disabled = true;
+
+            const phone = document.getElementById('login-phone').value.trim();
+            const password = document.getElementById('login-password').value;
+
+            // Simple phone validation
+            if (!/^\d{10,12}$/.test(phone)) {
+                displayError("Please enter a valid 10-12 digit phone number.");
+                loginButton.textContent = 'LOG IN';
+                loginButton.disabled = false;
+                return;
+            }
+
+            try {
+                // 1. Hash the entered password
+                const hashedPassword = await hashPassword(password);
+                
+                // 2. Query Firestore for the user document by phone number
+                const userQuery = await db.collection('users').where('phone', '==', phone).limit(1).get();
+                
+                if (userQuery.empty) {
+                    displayError("User not found. Please sign up.");
+                } else {
+                    const userDoc = userQuery.docs[0];
+                    const userData = userDoc.data();
+                    
+                    // 🚨 STATUS CHECK LOGIC: Check if the user is banned 🚨
+                    if (userData.status === 'banned') {
+                        // User is banned - DO NOT LOGIN
+                        displayError("❌ Your account is currently BANNED. Please contact support.");
+                        // Stop the login process here
+                        return; 
+                    }
+                    // ----------------------------------------------------
+
+                    // 3. Compare the hashed passwords
+                    if (userData.password === hashedPassword) {
+                        // Success! User is active and password matches.
+                        localStorage.setItem('loggedInUserUID', userDoc.id);
+                        
+                        // Update last login timestamp
+                        await db.collection('users').doc(userDoc.id).update({
+                            lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+
+                        // Redirect to index.html
+                        window.location.href = 'index.html'; 
+                        
+                    } else {
+                        displayError("Invalid password.");
+                    }
+                }
+            } catch (error) {
+                let errorMessage = "Login failed. Check phone/password or network.";
+                // Check for the specific security context error
+                if (error.message.includes('SECURE_CONTEXT_REQUIRED')) {
+                    errorMessage = error.message;
+                }
+                displayError(errorMessage);
+                console.error("Login Error:", error);
+            } finally {
+                loginButton.textContent = 'LOG IN';
+                loginButton.disabled = false;
+            }
+        });
+
+
+        // 4. 📝 CUSTOM SIGN UP FUNCTIONALITY (STATUS FIELD ADDED) 📝
+        signupForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            signupButton.textContent = 'Creating Account...';
+            signupButton.disabled = true;
+
+            const phone = document.getElementById('signup-phone').value.trim();
+            const password = document.getElementById('signup-password').value;
+            const referral = document.getElementById('referral').value.trim() || null; 
+
+            // --- Validation Checks ---
+            if (!document.getElementById('agree').checked) {
+                displayError("Please agree to the Terms and Conditions.");
+                signupButton.textContent = 'SIGN UP';
+                signupButton.disabled = false;
+                return;
+            }
+            if (!/^\d{10,12}$/.test(phone)) {
+                displayError("Please enter a valid 10-12 digit phone number.");
+                signupButton.textContent = 'SIGN UP';
+                signupButton.disabled = false;
+                return;
+            }
+            if (password.length < 6 || password.length > 16) {
+                displayError("Password must be between 6 and 16 characters.");
+                signupButton.textContent = 'SIGN UP';
+                signupButton.disabled = false;
+                return;
+            }
+            // -------------------------
+
+            try {
+                // 1. Check if user already exists
+                const existingUserQuery = await db.collection('users').where('phone', '==', phone).limit(1).get();
+
+                if (!existingUserQuery.empty) {
+                    displayError("This phone number is already registered. Please log in.");
+                    signupButton.textContent = 'SIGN UP';
+                    signupButton.disabled = false;
+                    return;
+                }
+                
+                // 2. Hash the password
+                const hashedPassword = await hashPassword(password);
+                
+                // 3. Create User Profile in Firestore
+                const customUID = generateCustomUID(); // Generate a unique ID for the document
+                
+                const newUserDoc = {
+                    username: `User${phone.slice(-4)}`,
+                    phone: phone,
+                    password: hashedPassword, 
+                    balance: 0.00,
+                    numericalUID: Math.floor(Math.random() * 900000) + 100000,
+                    lastLogin: firebase.firestore.FieldValue.serverTimestamp(), 
+                    referralCode: referral,
+                    avatarUrl: 'assets/png/4-12a0d0c5.webp',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    // 🔑 Setting default status to 'active' for new users 🔑
+                    status: 'active' 
+                };
+
+                await db.collection("users").doc(customUID).set(newUserDoc);
+                
+                // Success! Set session in localStorage and redirect
+                localStorage.setItem('loggedInUserUID', customUID);
+                window.location.href = 'index.html';
+
+            } catch (error) {
+                let errorMessage = "Sign up failed. Please check your network.";
+                
+                // 🚨 Handle the hashing failure specifically
+                if (error.message.includes('SECURE_CONTEXT_REQUIRED')) {
+                    errorMessage = "Error: Hashing failed. Please run on **HTTPS** or a secure **localhost** environment.";
+                } else if (error.code === 'permission-denied') {
+                    // Handle Firestore security rules failure
+                    errorMessage = "Sign up failed. Permission denied by database rules. Please check your Firestore rules.";
+                }
+                
+                console.error("Signup Error:", error); 
+                displayError(errorMessage);
+            } finally {
+                signupButton.textContent = 'SIGN UP';
+                signupButton.disabled = false;
+            }
+        });
+
+    });
+</script>
+</body>
+</html>

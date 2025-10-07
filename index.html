@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Russian Club - Home</title>
+    
+    <style>
+        /* Global & Reset Styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #1a1a1a; /* Dark background */
+            color: #f0f0f0; /* Light text */
+        }
+    /* Define fixed header/footer height for content padding */
+        :root {
+            --header-height: 55px; 
+            --footer-height: 60px;
+        }
+/* ------------------- GLASSMORPHIC STICKY HEADER ------------------- */
+.sticky-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-width: 335px;
+    margin: 0 auto;
+
+    /* Glassmorphism effect */
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(12px) saturate(180%);
+    -webkit-backdrop-filter: blur(12px) saturate(180%);
+
+    border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5em;  
+    font-weight: 800;   
+    z-index: 1000;
+    border-radius: 0 0 12px 12px;
+    letter-spacing: 1px;
+
+    /* Fixed height remove, padding se content safe */
+    height: auto;
+    padding: 8px 12px; /* Top & bottom padding for no cut */
+}
+
+/* Header text styling */
+.header-text {
+    line-height: 1.2; /* Thoda relaxed for multi-line */
+    text-shadow: 0 2px 6px rgba(0,0,0,0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.header-text span {
+    display: inline-block;
+    padding: 4px 8px;
+    color: white; 
+    font-size: 1.05em;
+}
+
+.header-text .russian-color {
+    color: #e50074; 
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 6px 0 0 6px;
+    font-weight: 900;
+}
+
+.header-text .club-color {
+    color: white;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 0 6px 6px 0;
+    font-weight: 700;
+}
+
+        /* ------------------- MAIN CONTENT AREA ------------------- */
+        .main-content {
+            padding-top: var(--header-height); 
+            padding-bottom: var(--footer-height); 
+            padding-left: 5px;
+            padding-right: 5px;
+        }
+        
+        /* ------------------- Top Banner/Slider ------------------- */
+        .top-banner {
+            width: 100%;
+            height: 170px; /* Approximate height based on screenshot */
+            background: linear-gradient(135deg, #e50074, #ffc700);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2em;
+            text-align: center;
+            margin-bottom: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+        .banner-text {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 1.5em;
+            font-weight: bold;
+            line-height: 1.2;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        /* ------------------- Rest of the Content Styles ------------------- */
+h2 {
+    font-size: 1.2em;
+    color: #fff;
+    margin: 18px 12px;
+    font-weight: bold;
+    border-left: 4px solid #ffc700; 
+    padding-left: 12px;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.6);
+}
+
+.category-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    padding: 0 12px;
+    margin-bottom: 22px;
+}
+
+.category-item {
+    text-align: center;
+    padding: 12px 8px;
+    border-radius: 16px;
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
+
+    /* 🔥 Glassmorphism Background */
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(10px) saturate(180%);
+    -webkit-backdrop-filter: blur(10px) saturate(180%);
+
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+/* Animated Golden Gradient Border */
+.category-item::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 16px;
+    padding: 2px; /* border thickness */
+    background: linear-gradient(135deg, #ffd700, #ff9900, #ffcc00, #ffb400, #ffd700);
+    background-size: 300% 300%;
+    animation: glowBorder 4s linear infinite;
+    -webkit-mask: 
+       linear-gradient(#fff 0 0) content-box, 
+       linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+}
+
+@keyframes glowBorder {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.category-item:hover {
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 6px 22px rgba(0,0,0,0.6);
+}
+
+.category-item img {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 8px;
+    filter: drop-shadow(0 3px 6px rgba(0,0,0,0.5));
+    position: relative;
+    z-index: 1;
+}
+
+.category-item img[src$=".png"] {
+    width: 95px;   /* PNG ka size thoda bada */
+    height: 85px;
+    margin-bottom: 8px;
+}
+
+.category-item span {
+    display: block;
+    font-size: 0.9em;
+    font-weight: bold;
+    color: #ffc700;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.7);
+    position: relative;
+    z-index: 1;
+}
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            padding: 0 10px 20px;
+        }
+        .game-card {
+            background-color: #333;
+            border-radius: 8px;
+            overflow: hidden;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+        }
+        .game-card img {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+        .game-card span {
+            display: block;
+            font-size: 0.8em;
+            font-weight: bold;
+            padding: 8px 0;
+            color: #fff;
+            background-color: #333;
+        }
+
+/* ------------------- Winning Information Animation ------------------- */
+.winning-list-container {
+    height: 200px; 
+    overflow: hidden;
+    padding: 0 10px;
+    position: relative;
+    background-color: #1a1a1a; /* optional dark background */
+}
+
+/* Wrapper for seamless scroll */
+.winning-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Duplicate items for seamless scroll */
+.winning-list > .winning-item {
+    animation: scroll-up 6s linear infinite;
+}
+
+/* Keyframes for smooth upward scroll */
+@keyframes scroll-up {
+    0% {
+        transform: translateY(0);
+    }
+    100% {
+        transform: translateY(-100%);
+    }
+}
+
+/* Individual item styling */
+.winning-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #2b2b2b;
+    height: 30px; 
+    line-height: 1;
+    background-color: #222; 
+}
+
+/* User info */
+.user-info {
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+}
+
+.user-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    margin-right: 10px;
+    background-color: #555; 
+    overflow: hidden;
+}
+
+.win-details {
+    font-size: 0.9em;
+}
+
+.win-amount {
+    font-weight: bold;
+    color: #5cb85c; 
+    font-size: 1em;
+}
+
+/* Earnings chart */
+.earnings-chart {
+    padding: 10px;
+    background-color: #2b2b2b; 
+}
+
+.chart-header {
+    display: flex;
+    justify-content: space-around;
+    padding-bottom: 15px;
+}
+        .rank-card {
+            text-align: center;
+            /* Flex basis added for better spacing */
+            flex-basis: 30%; 
+        }
+        .rank-card img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 3px solid #ffc700;
+            box-shadow: 0 0 5px rgba(255, 199, 0, 0.8);
+        }
+        .rank-card .rank-name {
+            font-size: 0.9em;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+        .rank-card .rank-amount {
+            font-size: 1.1em;
+            color: #ffc700;
+            font-weight: bold;
+        }
+        .chart-list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #3a3a3a;
+        }
+        .rank-number {
+            font-weight: bold;
+            width: 30px;
+            text-align: center;
+        }
+        .rank-info {
+            display: flex;
+            align-items: center;
+            flex-grow: 1;
+        }
+        .chart-amount {
+            font-weight: bold;
+            color: #d9534f; 
+            font-size: 1em;
+            background-color: #444;
+            padding: 5px 10px;
+            border-radius: 5px;
+            white-space: nowrap;
+        }
+
+        /* ------------------- FIXED BOTTOM NAVIGATION (Fixed to match all pages) ------------------- */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            max-width: 450px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-around;
+            background-color: #2b2b2b;
+            border-top: 1px solid #444;
+            padding: 5px 0;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            height: var(--footer-height); 
+            box-sizing: border-box; /* Include padding in height calculation */
+        }
+        .nav-item {
+            text-align: center;
+            text-decoration: none;
+            color: #999;
+            font-size: 0.7em;
+            padding: 5px 0;
+        }
+        .nav-item.active {
+            color: #ffc700; 
+        }
+        .nav-item img {
+            width: 24px;
+            height: 24px;
+            display: block;
+            margin: 0 auto 2px;
+            filter: grayscale(100%); 
+        }
+        .nav-item.active img {
+            filter: grayscale(0%); 
+        }
+        .special-nav-button {
+            background-color: #ffc700; 
+            color: #1a1a1a;
+            font-size: 0.9em;
+            font-weight: bold;
+            padding: 8px 15px;
+            border-radius: 20px;
+            margin-top: -10px;
+            box-shadow: 0 4px 10px rgba(255, 199, 0, 0.5);
+            align-self: center;
+        }
+
+/* ===== Bottom Nav Glassmorphism ===== */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 65px;
+    max-width: 450px; /* Added max-width to match container */
+    margin: 0 auto; /* Added margin auto */
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(12px) saturate(180%);
+    -webkit-backdrop-filter: blur(12px) saturate(180%);
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.2);
+    z-index: 999;
+}
+
+.bottom-nav .nav-item {
+    flex: 1;
+    text-align: center;
+    color: #ccc;
+    font-size: 12px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+.bottom-nav .nav-item img {
+    width: 25px;
+    height: 25px;
+    margin-bottom: 3px;
+    transition: transform 0.3s ease, filter 0.3s ease;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+}
+
+/* Active Nav Item */
+.bottom-nav .nav-item.active {
+    color: #ffc700;
+    font-weight: bold;
+}
+
+.bottom-nav .nav-item.active img {
+    transform: translateY(-3px) scale(1.1);
+    filter: drop-shadow(0 4px 6px rgba(255,199,0,0.6));
+}
+
+/* Underline Effect */
+.bottom-nav .nav-item span {
+    position: relative;
+}
+
+.bottom-nav .nav-item.active span::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 2px;
+    background: #ffc700;
+    border-radius: 2px;
+    animation: underline 0.3s ease forwards;
+}
+
+@keyframes underline {
+    from { width: 0; opacity: 0; }
+    to { width: 20px; opacity: 1; }
+}
+
+/* Special Button Capsule */
+.special-nav-button {
+    position: relative;
+    background: linear-gradient(135deg, #ffcc00, #ff8800);
+    padding: 12px 18px;
+    border-radius: 40px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #1a1a1a;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    transform: translateY(10%);
+    text-decoration: none;
+    text-align: center;
+    transition: transform 0.2s ease;
+    align-self: center; /* Added to center it */
+}
+
+.special-nav-button:hover {
+    transform: translateY(5%) scale(1.05);
+}
+
+/* PNG Icon Above Capsule (Placeholder, actual image path may vary) */
+.special-nav-button::before {
+    /* content: ''; */
+    /* position: absolute; */
+    /* top: -66px; */
+    /* left: 50%; */
+    /* transform: translateX(-50%); */
+    /* width: 66px; */
+    /* height: 66px; */
+    /* background: url('images/wheelprize.png') no-repeat center center; */
+    /* background-size: contain; */
+    /* pointer-events: none; */
+}
+</style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <div class="sticky-header">
+            <div class="header-text">
+                <span class="russian-color">RUSSIAN</span><span class="club-color">CLUB</span>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="top-banner">
+                <div class="banner-text">.</div>
+                <img src="https://ossimg.envyenvelope.com/daman/banner/Banner_20250821161507tin6.png" alt="Promotional Banner" style="width: 100%; height: 90%; object-fit: cover; opacity: 0.9;">
+            </div>
+
+            <div class="category-grid">
+                <div class="category-item">
+                    <img src="https://ossimg.envyenvelope.com/daman/gamecategory/gamecategory_20240412114829pq18.png" alt="Popular">
+                    <span>Popular</span>
+                </div>
+                <div class="category-item">
+                    <img src="https://ossimg.envyenvelope.com/daman/gamecategory/gamecategory_20240412114947sy3o.png" alt="Lottery">
+                    <span>Lottery</span>
+                </div>
+                <div class="category-item">
+                    <img src="assets/png/gamecategory_20240110061909hwqs.png" alt="Slots">
+                    <span>Slots</span>
+                </div>
+                <div class="category-item">
+                    <img src="assets/png/gamecategory_20240110061915xrqy.png" alt="Sports">
+                    <span>Sports</span>
+                </div>
+                <div class="category-item">
+                    <img src="https://ossimg.envyenvelope.com/daman/gamecategory/gamecategory_2024041211490142rl.png" alt="Card">
+                    <span>Card</span>
+                </div>
+                <div class="category-item">
+                    <img src="https://ossimg.envyenvelope.com/daman/gamecategory/gamecategory_20240412114848em94.png" alt="Fishing">
+                    <span>Fishing</span>
+                </div>
+                <div class="category-item">
+                    <img src="https://ossimg.envyenvelope.com/daman/gamecategory/gamecategory_20240412114937mcis.png" alt="Original">
+                    <span>Original</span>
+                </div>
+            </div>
+            
+            <h2>Games</h2>
+            <div class="games-grid">
+                <div class="game-card">
+                    <img src="https://ossimg.bdg123456.com/BDGWin/vendorlogo/vendorlogo_20240321183450ph8e.png" alt="JDB Game">
+                    <span>JDB Game</span>
+                </div>
+                <div class="game-card">
+                    <img src="https://ossimg.bdg123456.com/BDGWin/vendorlogo/vendorlogo_20240321183353rwkf.png" alt="Game 2">
+                    <span>Jili Game</span>
+                </div>
+                <div class="game-card">
+                    <img src="https://ossimg.bdg123456.com/BDGWin/vendorlogo/vendorlogo_20240321183534v51y.png" alt="Game 3">
+                    <span>M Game</span>
+                </div>
+                <div class="game-card">
+                    <img src="https://ossimg.bdg123456.com/BDGWin/vendorlogo/vendorlogo_20241119135804vtyn.png" alt="Game 4">
+                    <span>G9</span>
+                </div>
+                <div class="game-card">
+                    <img src="https://ossimg.bdg123456.com/BDGWin/vendorlogo/vendorlogo_20240321183343jxf6.png" alt="Game 5">
+                    <span>Evolution</span>
+                </div>
+                <div class="game-card">
+                    <img src="https://ossimg.bdg123456.com/BDGWin/vendorlogo/vendorlogo_20240321183506uo8v.png" alt="Game 6">
+                    <span>CQ9 Game</span>
+                </div>
+            </div>
+
+            <h2>Winning Information</h2>
+            <div class="winning-list-container">
+                <ul class="winning-list">
+                    <li class="winning-item">
+                        <div class="user-info">
+                            <div class="user-avatar"><img src="assets/png/avatar-fb4c2506.webp" alt="User"></div>
+                            <div class="win-details">
+                                <span>Ve****y02</span>
+                            </div>
+                        </div>
+                        <div class="win-amount">Wins ₹7,578.00</div>
+                    </li>
+                    <li class="winning-item">
+                        <div class="user-info">
+                            <div class="user-avatar"><img src="https://via.placeholder.com/30/808080?text=U" alt="User"></div>
+                            <div class="win-details">
+                                <span>Va****yG8</span>
+                            </div>
+                        </div>
+                        <div class="win-amount">Wins ₹992.25</div>
+                    </li>
+                    <li class="winning-item">
+                        <div class="user-info">
+                            <div class="user-avatar"><img src="https://via.placeholder.com/30/808080?text=U" alt="User"></div>
+                            <div class="win-details">
+                                <span>Cr****yW3</span>
+                            </div>
+                        </div>
+                        <div class="win-amount">Wins ₹19,255</div>
+                    </li>
+                    <li class="winning-item">
+                        <div class="user-info">
+                            <div class="user-avatar"><img src="https://via.placeholder.com/30/808080?text=U" alt="User"></div>
+                            <div class="win-details">
+                                <span>Ro****s02</span>
+                            </div>
+                        </div>
+                        <div class="win-amount">Wins ₹365.12</div>
+                    </li>
+                    <li class="winning-item">
+                        <div class="user-info">
+                            <div class="user-avatar"><img src="https://via.placeholder.com/30/808080?text=U" alt="User"></div>
+                            <div class="win-details">
+                                <span>Ne****x99</span>
+                            </div>
+                        </div>
+                        <div class="win-amount">Wins ₹498.2</div>
+                    </li>
+                    <li class="winning-item">
+                        <div class="user-info">
+                            <div class="user-avatar"><img src="assets/png/avatar-fb4c2506.webp" alt="User"></div>
+                            <div class="win-details">
+                                <span>Ve****y02</span>
+                            </div>
+                        </div>
+                        <div class="win-amount">Wins ₹7,578.00</div>
+                    </li>
+                    <li class="winning-item">
+                        <div class="user-info">
+                            <div class="user-avatar"><img src="https://via.placeholder.com/30/808080?text=U" alt="User"></div>
+                            <div class="win-details">
+                                <span>Va****yG8</span>
+                            </div>
+                        </div>
+                        <div class="win-amount">Wins ₹992.25</div>
+                    </li>
+                </ul>
+            </div>
+
+            <h2>Today's earnings chart</h2>
+            <div class="earnings-chart">
+                <div class="chart-header" id="leaderboard-top3">
+                    <div class="rank-card" id="rank-1-card"></div>
+                    <div class="rank-card" id="rank-2-card"></div>
+                    <div class="rank-card" id="rank-3-card"></div>
+                </div>
+                
+                <div class="chart-list" id="leaderboard-list">
+                    </div>
+            </div>
+        </div>
+
+<div class="bottom-nav">
+    <a href="home.html" class="nav-item active">
+        <img src="https://img.icons8.com/ios-filled/50/ffc700/home.png" alt="Home">
+        <span>Home</span>
+    </a>
+    <a href="activity.html" class="nav-item">
+        <img src="https://img.icons8.com/ios-filled/50/ffffff/activity-history.png" alt="Activity">
+        <span>Activity</span>
+    </a>
+    <a href="#" class="special-nav-button">
+        GET ₹300
+    </a>
+    <a href="promotion.html" class="nav-item">
+        <img src="https://img.icons8.com/ios-filled/50/ffffff/discount--v1.png" alt="Promotion">
+        <span>Promotion</span>
+    </a>
+    <a href="account.html" class="nav-item">
+        <img src="https://img.icons8.com/ios-filled/50/ffffff/user.png" alt="My">
+        <span>Account</span>
+    </a>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<script>
+    // --- Firebase Config (MUST be present for other pages to function) ---
+    var firebaseConfig = {
+        apiKey: "AIzaSyDlEY_2bDv25T5GTCzTEk7sQIZrAxh5irc",
+        authDomain: "russian-club.firebaseapp.com",
+        databaseURL: "https://russian-club-default-rtdb.firebaseio.com",
+        projectId: "russian-club",
+        storageBucket: "russian-club.appspot.com",
+        messagingSenderId: "1096848291195",
+        appId: "1:1096848291195:web:2c8c12e9c6c913f83210c7",
+        measurementId: "G-5M46DNJ1YP"
+    };
+
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
+
+    const db = firebase.firestore();
+
+    // Helper function to format currency
+    function formatCurrency(amount) {
+        return `₹${Number(amount).toLocaleString('en-IN', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        })}`;
+    }
+
+    // --- RENDER TOP 3 CARDS ---
+    function renderTop3(data) {
+        const top3Container = document.getElementById('leaderboard-top3');
+        top3Container.innerHTML = ''; // Clear existing content
+
+        const rankConfigs = [
+            { rank: 1, id: 'rank-1-card', borderColor: '#ffc700', amountColor: '#ffc700', avatarImg: 'assets/png/3-abfcc056.webp' }, // Gold
+            { rank: 2, id: 'rank-2-card', borderColor: '#cccccc', amountColor: '#cccccc', avatarImg: 'assets/png/4-12a0d0c5.webp' }, // Silver
+            { rank: 3, id: 'rank-3-card', borderColor: '#cd7f32', amountColor: '#cd7f32', avatarImg: 'assets/png/8-ea087ede.webp' }  // Bronze
+        ];
+
+        for (let i = 0; i < 3; i++) {
+            const user = data[i];
+            const config = rankConfigs[i];
+
+            if (user) {
+                const card = document.createElement('div');
+                card.className = 'rank-card';
+                card.id = config.id;
+                
+                // Use custom image for top 3 if available, otherwise use user's avatarUrl
+                const avatarSrc = user.avatarUrl || config.avatarImg; 
+                
+                card.innerHTML = `
+                    <img src="${avatarSrc}" alt="Rank ${user.rank}" style="border-color: ${config.borderColor};">
+                    <div class="rank-name">${user.username}</div>
+                    <div class="rank-amount" style="color: ${config.amountColor};">${formatCurrency(user.earnings)}</div>
+                `;
+                top3Container.appendChild(card);
+            }
+        }
+    }
+
+    // --- RENDER CHART LIST (Rank 4+) ---
+    function renderChartList(data) {
+        const listContainer = document.getElementById('leaderboard-list');
+        listContainer.innerHTML = ''; // Clear existing content
+
+        // Start from index 3 (Rank 4)
+        for (let i = 3; i < data.length; i++) {
+            const user = data[i];
+
+            const item = document.createElement('div');
+            item.className = 'chart-list-item';
+            
+            // Use user avatar or a generic placeholder
+            const avatarSrc = user.avatarUrl || `https://via.placeholder.com/25/808080?text=U`; 
+
+            item.innerHTML = `
+                <span class="rank-number">${user.rank}</span>
+                <div class="rank-info">
+                    <div class="user-avatar" style="width:25px; height:25px; margin-right: 5px;">
+                        <img src="${avatarSrc}" alt="User">
+                    </div>
+                    <span>${user.username}</span>
+                </div>
+                <span class="chart-amount">${formatCurrency(user.earnings)}</span>
+            `;
+            listContainer.appendChild(item);
+        }
+    }
+
+
+    // --- MAIN FETCH FUNCTION ---
+    async function fetchLeaderboardData() {
+        try {
+            // Fetch the top 10 users, ordered by earnings descending
+            const snapshot = await db.collection('leaderboard')
+                .orderBy('earnings', 'desc') 
+                .limit(10)
+                .get();
+
+            if (snapshot.empty) {
+                console.log("No leaderboard data found.");
+                document.getElementById('leaderboard-list').innerHTML = `<div style="text-align:center; padding: 20px;">No earnings data available today.</div>`;
+                return;
+            }
+
+            const leaderboardData = [];
+            let rankCounter = 1;
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                leaderboardData.push({
+                    rank: rankCounter++, // Assign rank based on query order
+                    username: data.username,
+                    earnings: data.earnings,
+                    avatarUrl: data.avatarUrl || '' // Use a safe default
+                });
+            });
+
+            // Render the data
+            renderTop3(leaderboardData);
+            renderChartList(leaderboardData);
+
+        } catch (error) {
+            console.error("Error fetching leaderboard:", error);
+            document.getElementById('leaderboard-list').innerHTML = `<div style="text-align:center; padding: 20px; color: red;">Error loading leaderboard. Check console/Firebase rules.</div>`;
+        }
+    }
+
+    // 🚨 CORE AUTHENTICATION FUNCTION (Kept from previous version) 🚨
+    function checkAuthentication() {
+        const uid = localStorage.getItem('loggedInUserUID');
+        if (!uid) {
+            console.log("User not logged in. Redirecting to login.html");
+            window.location.href = 'login.html';
+            return false;
+        }
+        return true;
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        // --- 1. AUTHENTICATION CHECK ---
+        if (checkAuthentication()) {
+            // --- 2. LEADERBOARD DATA FETCH ---
+            fetchLeaderboardData();
+        }
+        
+
+        // --- 3. Bottom Nav Active State Logic ---
+        const navItems = document.querySelectorAll(".bottom-nav .nav-item");
+        const currentPage = window.location.pathname.split("/").pop() || 'home.html';
+
+        navItems.forEach(item => {
+            const href = item.getAttribute("href");
+            if (href && (href.split("/").pop() === currentPage)) {
+                item.classList.add("active");
+                const img = item.querySelector('img');
+                if (img) {
+                    const iconName = img.src.split("/").pop().replace('.png', '');
+                    if (iconName === 'home') {
+                        img.src = 'https://img.icons8.com/ios-filled/50/ffc700/home.png';
+                    }
+                }
+            } else {
+                item.classList.remove("active");
+                const img = item.querySelector('img');
+                if (img) {
+                    const iconName = img.src.split("/").pop().split('?')[0];
+                    if (iconName !== 'home.png' || img.src.includes('ffc700')) {
+                        img.src = img.src.replace(/ffc700\/(.*)/, 'ffffff/$1');
+                    }
+                }
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
